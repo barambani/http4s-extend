@@ -8,6 +8,6 @@ import org.http4s.circe.jsonEncoderOf
 
 object EntityEncoderModule {
 
-  def eitherEntityEncoder[E, A : Encoder](implicit EC: ErrorConversion[Throwable, E]): EntityEncoder[Either[E, ?], A] =
+  def eitherEntityEncoder[E : ErrorConversion[Throwable, ?], A : Encoder]: EntityEncoder[Either[E, ?], A] =
     jsonEncoderOf[Either[E, ?], A]
 }
