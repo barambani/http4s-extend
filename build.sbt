@@ -21,7 +21,7 @@ val crossBuildSettings: Seq[Def.Setting[_]] = Seq(
       case Scala_212           => scala212Options
       case Scala_typelevel_212 => scala212Options ++ typeLevelScalaOptions
       case _                   => Seq()
-    }),
+    })
 )
 
 val releaseSettings: Seq[Def.Setting[_]] = Seq(
