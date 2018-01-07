@@ -1,5 +1,3 @@
-import sbt._
-
 object ScalacOptions {
 
   val crossBuildOptions: Seq[String] = Seq (
