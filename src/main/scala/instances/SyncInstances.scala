@@ -1,9 +1,9 @@
-package com.gilt.lib.instances
+package http4s.extend.instances
 
 import cats.effect.Sync
 import cats.syntax.either._
 import cats.syntax.flatMap._
-import com.gilt.lib.ErrorConversion
+import http4s.extend.ErrorConversion
 
 object SyncInstances {
 

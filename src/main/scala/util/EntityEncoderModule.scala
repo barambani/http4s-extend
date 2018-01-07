@@ -1,7 +1,7 @@
-package com.gilt.lib.util
+package http4s.extend.util
 
-import com.gilt.lib.ErrorConversion
-import com.gilt.lib.instances.SyncInstances._
+import http4s.extend.ErrorConversion
+import http4s.extend.instances.SyncInstances._
 import io.circe.Encoder
 import org.http4s.EntityEncoder
 import org.http4s.circe.jsonEncoderOf

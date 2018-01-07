@@ -1,8 +1,8 @@
-package com.gilt.lib.syntax
+package http4s.extend.syntax
 
 import cats.MonadError
-import com.gilt.lib.ErrorConversion
-import com.gilt.lib.util.MonadErrorModule
+import http4s.extend.ErrorConversion
+import http4s.extend.util.MonadErrorModule
 
 import scala.language.higherKinds
 

@@ -1,4 +1,4 @@
-package com.gilt.lib.syntax
+package http4s.extend.syntax
 
 import cats.syntax.flatMap._
 import cats.{FlatMap, Functor}

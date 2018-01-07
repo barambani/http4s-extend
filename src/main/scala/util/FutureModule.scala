@@ -1,9 +1,9 @@
-package com.gilt.lib.util
+package http4s.extend.util
 
 import cats.syntax.either._
-import com.gilt.lib.ByNameNaturalTransformation._
-import com.gilt.lib.EffectfulOp
-import com.gilt.lib.syntax.ByNameNaturalTransformationSyntax._
+import http4s.extend.ByNameNaturalTransformation._
+import http4s.extend.EffectfulOp
+import http4s.extend.syntax.ByNameNaturalTransformationSyntax._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.higherKinds

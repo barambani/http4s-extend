@@ -1,4 +1,4 @@
-package com.gilt.lib
+package http4s.extend
 
 trait ErrorConversion[E1, E2] {
   def direct: E1 => E2

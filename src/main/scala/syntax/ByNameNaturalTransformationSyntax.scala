@@ -1,6 +1,6 @@
-package com.gilt.lib.syntax
+package http4s.extend.syntax
 
-import com.gilt.lib.ByNameNaturalTransformation.~>
+import http4s.extend.ByNameNaturalTransformation.~>
 
 import scala.language.higherKinds
 

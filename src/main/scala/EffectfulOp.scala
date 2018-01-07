@@ -1,4 +1,4 @@
-package com.gilt.lib
+package http4s.extend
 
 import cats.Monad
 import cats.effect.{Effect, IO}

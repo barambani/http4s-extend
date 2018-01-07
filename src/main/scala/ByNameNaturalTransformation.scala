@@ -1,4 +1,4 @@
-package com.gilt.lib
+package http4s.extend
 
 import cats.Eval.always
 import cats.arrow.FunctionK
