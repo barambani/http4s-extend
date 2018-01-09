@@ -6,5 +6,5 @@ trait ErrorConversion[E1, E2] {
 }
 
 object ErrorConversion {
-  def apply[E1, E2](implicit E: ErrorConversion[E1, E2]): ErrorConversion[E1, E2] = E
+  @inline def apply[E1, E2](implicit E: ErrorConversion[E1, E2]): ErrorConversion[E1, E2] = E
 }

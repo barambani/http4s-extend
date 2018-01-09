@@ -19,7 +19,7 @@ trait EffectfulOp[F[_]] {
 
 object EffectfulOp {
 
-  def apply[F[_]](implicit F: EffectfulOp[F]): EffectfulOp[F] = F
+  @inline def apply[F[_]](implicit F: EffectfulOp[F]): EffectfulOp[F] = F
 
   implicit val ioEffectfulOp: EffectfulOp[IO] =
     new EffectfulOp[IO] {
