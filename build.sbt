@@ -4,29 +4,30 @@ import ScalacOptions._
 val typelevelOrganization = "org.typelevel"
 val globalOrganization = scalaOrganization in Global
 
-val Scala_typelevel_212 = "2.12.4-bin-typelevel-4"
-val Scala_211 = "2.11.11"
-val Scala_212 = "2.12.4"
+val scala_typelevel_212 = "2.12.4-bin-typelevel-4"
+val scala_211 = "2.11.11"
+val scala_212 = "2.12.4"
 
 val crossBuildSettings: Seq[Def.Setting[_]] = Seq(
   scalacOptions           ++= crossBuildOptions,
-  crossScalaVersions 	    :=  Seq(Scala_211, Scala_212),
+  crossScalaVersions 	    :=  Seq(scala_211, scala_212),
   scalaOrganization :=
     (scalaVersion.value match {
-      case Scala_typelevel_212 => typelevelOrganization
+      case `scala_typelevel_212` => typelevelOrganization
       case _                   => globalOrganization.value
     }),
   scalacOptions ++=
     (scalaVersion.value match {
-      case Scala_212           => scala212Options
-      case Scala_typelevel_212 => scala212Options ++ typeLevelScalaOptions
-      case _                   => Seq()
+      case `scala_212`            => scala212Options
+      case `scala_typelevel_212`  => scala212Options ++ typeLevelScalaOptions
+      case _                      => Seq()
     })
 )
 
 val releaseSettings: Seq[Def.Setting[_]] = Seq(
   releaseCrossBuild             := true,
   publishMavenStyle             := true,
+  credentials                   := Credentials(Path.userHome / ".ivy2" / ".credentials") :: Nil,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   publishArtifact in Test       := false,
   pomIncludeRepository          := { _ => false },
@@ -54,9 +55,8 @@ val root = project.in(file("."))
   .settings(crossBuildSettings)
   .settings(releaseSettings)
   .settings(
-    version 	              :=  "0.0.1",
     name 	                  :=  "http4s-extend",
-    scalaVersion            :=  Scala_typelevel_212,
+    scalaVersion            :=  scala_typelevel_212,
     libraryDependencies     ++= externalDependencies,
     scalacOptions in Test   ++= testOnlyOptions,
     scalacOptions in (Compile, console) --= nonTestExceptions,
