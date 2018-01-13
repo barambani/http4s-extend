@@ -17,7 +17,7 @@ sealed trait ByNameNaturalTransformation[F[_], G[_]] {
 
 object ByNameNaturalTransformation {
 
-  type ~>[F[_], G[_]] = ByNameNaturalTransformation[F, G]
+  type ~~>[F[_], G[_]] = ByNameNaturalTransformation[F, G]
 
   implicit def futureToIo(implicit ec: ExecutionContext): ByNameNaturalTransformation[Future, IO] =
     new ByNameNaturalTransformation[Future, IO] {

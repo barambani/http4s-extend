@@ -10,7 +10,7 @@ import scala.language.higherKinds
 
 trait FutureModule {
 
-  def liftTo[F[_] : EffectfulOp : ~>[Future, ?[_]], A](aFuture: Future[A]): F[A] =
+  def liftTo[F[_] : EffectfulOp : ~~>[Future, ?[_]], A](aFuture: Future[A]): F[A] =
     aFuture.lift
 
   def adaptError[E, A](aFuture: Future[A])(errM: Throwable => E)(implicit ec: ExecutionContext): Future[E Either A] =
