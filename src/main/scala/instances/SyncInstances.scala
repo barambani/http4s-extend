@@ -3,11 +3,11 @@ package http4s.extend.instances
 import cats.effect.Sync
 import cats.syntax.either._
 import cats.syntax.flatMap._
-import http4s.extend.ErrorConversion
+import http4s.extend.ErrorInvariantMap
 
 object SyncInstances {
 
-  implicit def eitherSync[Err](implicit EC: ErrorConversion[Throwable, Err]): Sync[Either[Err, ?]] =
+  implicit def eitherSync[Err](implicit EC: ErrorInvariantMap[Throwable, Err]): Sync[Either[Err, ?]] =
     new Sync[Either[Err, ?]] {
 
       def suspend[A](thunk: => Either[Err, A]): Either[Err, A] =

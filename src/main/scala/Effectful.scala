@@ -6,7 +6,7 @@ import cats.effect.{Effect, IO}
 import scala.language.higherKinds
 import scala.util.Either
 
-trait EffectfulOp[F[_]] {
+trait Effectful[F[_]] {
 
   val F: Monad[F]
 
@@ -17,12 +17,12 @@ trait EffectfulOp[F[_]] {
     suspend(F.pure(t))
 }
 
-object EffectfulOp {
+object Effectful {
 
-  @inline def apply[F[_]](implicit F: EffectfulOp[F]): EffectfulOp[F] = F
+  @inline def apply[F[_]](implicit F: Effectful[F]): Effectful[F] = F
 
-  implicit val ioEffectfulOp: EffectfulOp[IO] =
-    new EffectfulOp[IO] {
+  implicit val ioEffectfulOp: Effectful[IO] =
+    new Effectful[IO] {
 
       val F: Monad[IO] = Effect[IO]
 

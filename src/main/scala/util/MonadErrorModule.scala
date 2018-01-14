@@ -1,13 +1,13 @@
 package http4s.extend.util
 
 import cats.MonadError
-import http4s.extend.ErrorConversion
+import http4s.extend.ErrorInvariantMap
 
 import scala.language.higherKinds
 
 object MonadErrorModule {
 
-  def adaptErrorType[F[_], E1, E2](me: MonadError[F, E1])(implicit EC: ErrorConversion[E1, E2]): MonadError[F, E2] =
+  def adaptErrorType[F[_], E1, E2](me: MonadError[F, E1])(implicit EC: ErrorInvariantMap[E1, E2]): MonadError[F, E2] =
     new MonadError[F, E2] {
 
       def raiseError[A](e: E2): F[A] =
