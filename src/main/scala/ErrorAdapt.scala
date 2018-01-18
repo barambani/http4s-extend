@@ -12,7 +12,7 @@ trait ErrorAdapt[F[_]] {
 
 object ErrorAdapt {
 
-  def apply[F[_]](implicit F: ErrorAdapt[F]): ErrorAdapt[F] = F
+  @inline def apply[F[_]](implicit F: ErrorAdapt[F]): ErrorAdapt[F] = F
 
   implicit def monixTaskErrorAdapt: ErrorAdapt[MonixTask] =
     new ErrorAdapt[MonixTask] {
