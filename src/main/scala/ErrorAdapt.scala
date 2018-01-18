@@ -1,4 +1,4 @@
-package http4s.extend.util
+package http4s.extend
 
 import cats.syntax.either._
 import monix.eval.{Task => MonixTask}
