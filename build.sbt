@@ -13,8 +13,8 @@ val crossBuildSettings: Seq[Def.Setting[_]] = Seq(
   crossScalaVersions 	    :=  Seq(scala_211, scala_212),
   scalaOrganization :=
     (scalaVersion.value match {
-      case `scala_typelevel_212` => typelevelOrganization
-      case _                   => globalOrganization.value
+      case `scala_typelevel_212`  => typelevelOrganization
+      case _                      => globalOrganization.value
     }),
   scalacOptions ++=
     (scalaVersion.value match {
@@ -55,7 +55,8 @@ val root = project.in(file("."))
   .settings(crossBuildSettings)
   .settings(releaseSettings)
   .settings(
-    name 	                  :=  "http4s-extend",
+    name                    :=  "http4s-extend",
+    organization            :=  "com.github.barambani",
     scalaVersion            :=  scala_typelevel_212,
     libraryDependencies     ++= externalDependencies,
     scalacOptions in Test   ++= testOnlyOptions,
