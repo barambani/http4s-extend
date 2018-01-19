@@ -14,6 +14,6 @@ resolvers ++= Seq(
 ```
 and then create the dependency adding the following to the build
 ```scala
-libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.5"
+libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.6"
 ```
 **Note:** a sample configuration can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/build.sbt) where the dependencies are taken from [here](https://github.com/barambani/http4s-poc-api/blob/master/project/Dependencies.scala)
