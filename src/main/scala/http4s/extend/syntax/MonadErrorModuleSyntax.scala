@@ -6,7 +6,7 @@ import http4s.extend.util.MonadErrorModule
 
 import scala.language.higherKinds
 
-object MonadErrorModuleSyntax {
+trait MonadErrorModuleSyntax {
 
   implicit final class MonadErrorModuleOps[F[_], E1](me: MonadError[F, E1]) {
     def adaptErrorType[E2](implicit EC: ErrorInvariantMap[E1, E2]): MonadError[F, E2] =

@@ -2,10 +2,9 @@ package http4s.extend.syntax
 
 import cats.MonadError
 import http4s.extend.ByNameNaturalTransformation.~~>
-
 import scala.language.higherKinds
 
-object ByNameNaturalTransformationSyntax {
+trait ByNameNaturalTransformationSyntax {
 
   implicit final class ByNameNaturalTransformationOps[F[_], G[_], A](fa: F[A])(implicit nt: F ~~> G) {
     def lift: G[A] = nt(fa)
