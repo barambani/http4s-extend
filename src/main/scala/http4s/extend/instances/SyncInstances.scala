@@ -5,7 +5,7 @@ import cats.syntax.either._
 import cats.syntax.flatMap._
 import http4s.extend.ErrorInvariantMap
 
-object SyncInstances {
+trait SyncInstances {
 
   implicit def eitherSync[Err](implicit EC: ErrorInvariantMap[Throwable, Err]): Sync[Either[Err, ?]] =
     new Sync[Either[Err, ?]] {
