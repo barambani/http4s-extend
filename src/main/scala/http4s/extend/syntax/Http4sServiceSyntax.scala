@@ -6,7 +6,7 @@ import org.http4s.{HttpService, Request, Response}
 
 import scala.language.higherKinds
 
-object Http4sServiceSyntax {
+trait Http4sServiceSyntax {
 
   implicit final class HttpServiceSyntaxOps[F[_]](service: HttpService[F]) {
 

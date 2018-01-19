@@ -8,5 +8,3 @@ trait ErrorAdaptSyntax {
       F.adaptError(anFa)(errM)
   }
 }
-
-object ErrorAdaptSyntax extends ErrorAdaptSyntax

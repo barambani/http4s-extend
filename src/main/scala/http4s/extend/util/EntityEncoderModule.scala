@@ -1,7 +1,7 @@
 package http4s.extend.util
 
 import http4s.extend.ErrorInvariantMap
-import http4s.extend.instances.SyncInstances._
+import http4s.extend.instances.sync._
 import io.circe.Encoder
 import org.http4s.EntityEncoder
 import org.http4s.circe.jsonEncoderOf
