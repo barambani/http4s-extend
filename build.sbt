@@ -59,8 +59,8 @@ val root = project.in(file("."))
     organization            :=  "com.github.barambani",
     scalaVersion            :=  scala_typelevel_212,
     libraryDependencies     ++= externalDependencies,
+    libraryDependencies     ++= compilerPlugins,
     scalacOptions in Test   ++= testOnlyOptions,
     scalacOptions in (Compile, console) --= nonTestExceptions,
-    resolvers               +=  Resolver.sonatypeRepo("releases"),
-    addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")
+    resolvers               +=  Resolver.sonatypeRepo("releases")
   )
