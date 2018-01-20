@@ -19,7 +19,7 @@ resolvers ++= Seq(
 ```
 and then create the dependency by adding the following to the build
 ```scala
-libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.6"
+libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.7"
 ```
 **Note:** a sample configuration can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/build.sbt) where the dependencies are taken from [here](https://github.com/barambani/http4s-poc-api/blob/master/project/Dependencies.scala)
 
@@ -28,4 +28,4 @@ For its own purpose is integration, Http4s Extend will bring into a using projec
 
 |       | Http4s    | Monix    | Scalaz Concurrent | Cats (from Http4s) | Cats Effect (from Monix) | Circe (from Http4s) |
 | ----- |:---------:|:--------:|:-----------------:|:------------------:| :-----------------------:|:-------------------:|
-| 0.0.6 | 0.18.0-M8 | 3.0.0-M3 | 7.2.18            | 1.0.1              | 0.8                      | 0.9.0               |
+| 0.0.7 | 0.18.0-M8 | 3.0.0-M3 | 7.2.18            | 1.0.1              | 0.8                      | 0.9.0               |
