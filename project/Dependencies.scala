@@ -14,9 +14,12 @@ object Dependencies {
     "org.http4s"          %% "http4s-blaze-server"  % http4sVersion withSources(),
     "org.http4s"          %% "http4s-blaze-client"  % http4sVersion withSources(),
     "org.http4s"          %% "http4s-circe"         % http4sVersion withSources(),
-    "io.monix"            %% "monix"                % monixVersion withSources(),
-    "org.scalaz"          %% "scalaz-concurrent"    % scalazVersion withSources(),
-    "org.scalacheck"      %% "scalacheck"           % scalaCheckVersion % "test" withSources()
+    "io.monix"            %% "monix"                % monixVersion  withSources(),
+    "org.scalaz"          %% "scalaz-concurrent"    % scalazVersion withSources()
+  )
+
+  val testDependencies: Seq[ModuleID] = Seq(
+    "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test" withSources()
   )
 
   val compilerPlugins: Seq[ModuleID] = Seq(

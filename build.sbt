@@ -5,7 +5,7 @@ val typelevelOrganization = "org.typelevel"
 val globalOrganization = scalaOrganization in Global
 
 val scala_typelevel_212 = "2.12.4-bin-typelevel-4"
-val scala_211 = "2.11.11"
+val scala_211 = "2.11.12"
 val scala_212 = "2.12.4"
 
 val crossBuildSettings: Seq[Def.Setting[_]] = Seq(
@@ -58,9 +58,7 @@ val root = project.in(file("."))
     name                    :=  "http4s-extend",
     organization            :=  "com.github.barambani",
     scalaVersion            :=  scala_typelevel_212,
-    libraryDependencies     ++= externalDependencies,
-    libraryDependencies     ++= compilerPlugins,
+    libraryDependencies     ++= externalDependencies ++ testDependencies ++ compilerPlugins,
     scalacOptions in Test   ++= testOnlyOptions,
-    scalacOptions in (Compile, console) --= nonTestExceptions,
-    resolvers               +=  Resolver.sonatypeRepo("releases")
+    scalacOptions in (Compile, console) --= nonTestExceptions
   )
