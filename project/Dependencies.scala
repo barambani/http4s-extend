@@ -7,7 +7,9 @@ object Dependencies {
   private val scalazVersion     = "7.2.18"
   private val scalaCheckVersion = "1.13.5"
 
-  val externalDependencies = Seq(
+  private val kindProjectorVersion = "0.9.4"
+
+  val externalDependencies: Seq[ModuleID] = Seq(
     "org.http4s"          %% "http4s-dsl"           % http4sVersion withSources(),
     "org.http4s"          %% "http4s-blaze-server"  % http4sVersion withSources(),
     "org.http4s"          %% "http4s-blaze-client"  % http4sVersion withSources(),
@@ -15,5 +17,9 @@ object Dependencies {
     "io.monix"            %% "monix"                % monixVersion withSources(),
     "org.scalaz"          %% "scalaz-concurrent"    % scalazVersion withSources(),
     "org.scalacheck"      %% "scalacheck"           % scalaCheckVersion % "test" withSources()
+  )
+
+  val compilerPlugins: Seq[ModuleID] = Seq(
+    compilerPlugin("org.spire-math" %% "kind-projector" % kindProjectorVersion)
   )
 }
