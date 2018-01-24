@@ -4,6 +4,7 @@ import cats.Eval
 import cats.Eval.always
 import cats.arrow.FunctionK
 import cats.effect.IO
+import cats.syntax.either._
 import monix.eval.{Task => MonixTask}
 import monix.execution.Scheduler
 
@@ -37,6 +38,11 @@ object ByNameNaturalTransformation {
   implicit def scalazTaskToIo: ByNameNaturalTransformation[ScalazTask, IO] =
     new ByNameNaturalTransformation[ScalazTask, IO] {
       def apply[A](fa: => ScalazTask[A]): IO[A] =
-        IO.eval(Eval.always(fa.unsafePerformSync))
+        Eval.always(
+          Either.catchNonFatal(fa.unsafePerformSync).fold(
+            e => IO.raiseError[A](e),
+            a => IO.pure(a)
+          )
+        ).value
     }
 }

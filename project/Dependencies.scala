@@ -5,7 +5,9 @@ object Dependencies {
   private val http4sVersion     = "0.18.0-M8"
   private val monixVersion      = "3.0.0-M3"
   private val scalazVersion     = "7.2.18"
-  private val scalaCheckVersion = "1.13.5"
+
+  private val catsTestKitVersion  = "1.0.1"
+  private val scalaCheckVersion   = "1.13.5"
 
   private val kindProjectorVersion = "0.9.4"
 
@@ -19,7 +21,8 @@ object Dependencies {
   )
 
   val testDependencies: Seq[ModuleID] = Seq(
-    "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test" withSources()
+    "org.typelevel"   %% "cats-testkit" % catsTestKitVersion  % "test" withSources(),
+    "org.scalacheck"  %% "scalacheck"   % scalaCheckVersion   % "test" withSources()
   )
 
   val compilerPlugins: Seq[ModuleID] = Seq(
