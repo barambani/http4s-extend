@@ -18,7 +18,7 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
   implicit val futureExecutionContext: ExecutionContext =
     ExecutionContext.fromExecutor(new ForkJoinPool())
 
-  case class TestError(errorCode: Int)
+  case class TestError(error: String)
 
   def futureEither[A](fa: Future[A]): Future[Either[Throwable, A]] =
     ErrorAdapt[Future].attemptMapLeft(fa)(identity[Throwable])
@@ -30,7 +30,7 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
     Eq.by[Throwable, String](_.toString)
 
   implicit val testErrorEq: Eq[TestError] =
-    Eq.by[TestError, Int](_.errorCode)
+    Eq.by[TestError, String](_.error)
 
   implicit def equalFuture[A: Eq]: Eq[Future[A]] =
     (fx: Future[A], fy: Future[A]) =>
@@ -42,8 +42,8 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
   implicit def futureCogen[A : Cogen]: Cogen[Future[A]] =
     Cogen[Future[A]] { (seed: Seed, t: Future[A]) => Cogen[A].perturb(seed, Await.result(t, 1.second)) }
 
-  implicit def testErrorCogen(implicit IC: Cogen[Int]): Cogen[TestError] =
-    IC contramap (_.errorCode)
+  implicit def testErrorCogen(implicit IC: Cogen[String]): Cogen[TestError] =
+    IC contramap (_.error)
 
   /**
     * Arbitrary instances
@@ -51,7 +51,7 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
   implicit val nonFatalArbitrary: Arbitrary[Throwable] =
     Arbitrary(arbitrary[Exception].map(identity))
 
-  implicit def testErrorArb(implicit AI: Arbitrary[Int]): Arbitrary[TestError] =
+  implicit def testErrorArb(implicit AI: Arbitrary[String]): Arbitrary[TestError] =
     Arbitrary { AI.arbitrary map TestError }
 
 
@@ -61,10 +61,10 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
   val testErrorInvariantMap: ErrorInvariantMap[Throwable, TestError] =
     new ErrorInvariantMap[Throwable, TestError] {
       def direct: Throwable => TestError =
-        th => TestError(th.getMessage.length)
+        th => TestError(th.getMessage)
 
       def reverse: TestError => Throwable =
-        er => new Throwable(s"TestError: ${er.errorCode}")
+        er => new Throwable(er.error)
     }
 
   val stringAdapt: MonadError[Future, String] =
@@ -76,6 +76,6 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
   /**
     * Verification
     */
-  checkAll("Future of MonadError with int error", MonadErrorTests[Future, String](stringAdapt).monadError[String, Boolean, Int])
-  checkAll("Future of MonadError with int error", MonadErrorTests[Future, TestError](testErrorAdapt).monadError[Boolean, Int, String])
+  checkAll("MonadErrorTests[Future, String]", MonadErrorTests[Future, String](stringAdapt).monadError[String, Boolean, Int])
+  checkAll("MonadErrorTests[Future, TestError]", MonadErrorTests[Future, TestError](testErrorAdapt).monadError[Boolean, Int, String])
 }

@@ -2,17 +2,23 @@ package http4s.extend.syntax
 
 import cats.MonadError
 import http4s.extend.ByNameNaturalTransformation.~~>
+
 import scala.language.higherKinds
 
 trait ByNameNaturalTransformationSyntax {
 
-  implicit final class ByNameNaturalTransformationOps[F[_], G[_], A](fa: F[A])(implicit nt: F ~~> G) {
-    def lift: G[A] = nt(fa)
-    def ~~>(): G[A] = lift
-  }
+  implicit def byNameNtSyntax[F[_] : ?[_] ~~> G, G[_], A](fa: F[A]): ByNameNtOps[F, G, A] = new ByNameNtOps(fa)
 
-  implicit final class ByNameNaturalTransformationOps2[F[_], G[_], A, E](fa: =>F[Either[E, A]])(implicit nt: F ~~> G) {
-    def liftIntoMonadError(implicit err: MonadError[G, E]): G[A] =
-      err.rethrow(fa.lift)
-  }
+  implicit def byNameEitherNtSyntax[F[_] : ?[_] ~~> G, G[_], A, E](fa: =>F[Either[E, A]]): ByNameEitherNtOps[F, G, A, E] =
+    new ByNameEitherNtOps(fa)
+}
+
+final class ByNameNtOps[F[_], G[_], A](fa: F[A])(implicit nt: F ~~> G) {
+  def lift: G[A] = nt(fa)
+  def ~~>(): G[A] = lift
+}
+
+final class ByNameEitherNtOps[F[_], G[_], A, E](fa: =>F[Either[E, A]])(implicit nt: F ~~> G) {
+  def liftIntoMonadError(implicit err: MonadError[G, E]): G[A] =
+    (err.rethrow[A] _ compose nt.apply)(fa)
 }
