@@ -6,7 +6,7 @@ import cats.{Eq, MonadError}
 import http4s.extend.instances.errorInvariantMap._
 import http4s.extend.syntax.monadError._
 import http4s.extend.{ErrorAdapt, ErrorInvariantMap}
-import org.scalacheck.Arbitrary.arbitrary
+import laws.checks.ErrorInvariantMapLawsChecks
 import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Cogen}
 
@@ -27,7 +27,7 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
     * Equality instances
     */
   implicit val throwableEq: Eq[Throwable] =
-    Eq.by[Throwable, String](_.toString)
+    Eq.by[Throwable, String](_.getMessage)
 
   implicit val testErrorEq: Eq[TestError] =
     Eq.by[TestError, String](_.error)
@@ -48,12 +48,20 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
   /**
     * Arbitrary instances
     */
-  implicit val nonFatalArbitrary: Arbitrary[Throwable] =
-    Arbitrary(arbitrary[Exception].map(identity))
-
   implicit def testErrorArb(implicit AI: Arbitrary[String]): Arbitrary[TestError] =
     Arbitrary { AI.arbitrary map TestError }
 
+  /**
+    * ErrorInvariantMap under test
+    */
+  implicit def testErrorMap: ErrorInvariantMap[Throwable, TestError] =
+    new ErrorInvariantMap[Throwable, TestError] {
+      def direct: Throwable => TestError =
+        th => TestError(th.getMessage)
+
+      def reverse: TestError => Throwable =
+        te => new Throwable(te.error)
+    }
 
   /**
     * MonadError under test
@@ -76,6 +84,9 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
   /**
     * Verification
     */
+  checkAll("ErrorInvariantMapLawsChecks[Throwable, String]", ErrorInvariantMapLawsChecks[Throwable, String].errorInvariantMap)
+  checkAll("ErrorInvariantMapLawsChecks[Throwable, TestError]", ErrorInvariantMapLawsChecks[Throwable, TestError].errorInvariantMap)
+
   checkAll("MonadErrorTests[Future, String]", MonadErrorTests[Future, String](stringAdapt).monadError[String, Boolean, Int])
   checkAll("MonadErrorTests[Future, TestError]", MonadErrorTests[Future, TestError](testErrorAdapt).monadError[Boolean, Int, String])
 }
