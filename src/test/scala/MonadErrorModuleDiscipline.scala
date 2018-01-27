@@ -33,8 +33,12 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
     Eq.by[TestError, String](_.error)
 
   implicit def equalFuture[A: Eq]: Eq[Future[A]] =
-    (fx: Future[A], fy: Future[A]) =>
-      Await.result(futureEither(fx) zip futureEither(fy) map { case (tx, ty) => tx === ty }, 1.second)
+    new Eq[Future[A]] {
+      def eqv(x: Future[A], y: Future[A]): Boolean =
+        Await.result(
+          futureEither(x) zip futureEither(y) map { case (tx, ty) => tx === ty }, 1.second
+        )
+    }
 
   /**
     * Cogen instances
