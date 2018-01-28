@@ -46,8 +46,8 @@ final class MonadErrorModuleDiscipline extends CatsSuite {
   implicit def futureCogen[A : Cogen]: Cogen[Future[A]] =
     Cogen[Future[A]] { (seed: Seed, t: Future[A]) => Cogen[A].perturb(seed, Await.result(t, 1.second)) }
 
-  implicit def testErrorCogen(implicit IC: Cogen[String]): Cogen[TestError] =
-    IC contramap (_.error)
+  implicit def testErrorCogen(implicit SC: Cogen[String]): Cogen[TestError] =
+    SC contramap (_.error)
 
   /**
     * Arbitrary instances
