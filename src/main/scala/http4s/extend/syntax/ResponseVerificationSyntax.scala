@@ -14,6 +14,8 @@ import http4s.extend.instances.sync._
 import http4s.extend.syntax.responseVerification._
 import org.http4s.{EntityDecoder, Response, Status}
 
+import scala.util.{Either, Right}
+
 trait ResponseVerificationSyntax {
 
   implicit def verifiedSyntax[A : Eq : Show](a: A) = new VerifiedOps(a)
@@ -46,7 +48,10 @@ final class EitherResultOps[E : ErrorInvariantMap[Throwable, ?]](result: Either[
     )
 
   private def verifiedResponseText[A](res: Response[Either[E, ?]], expected: String): Verified[String] =
-    res.body.compile.toVector.map(_.toArray).fold(
+    (res.body.compile.toVector match {
+      case Right(b) => Right(b.toArray)
+      case Left(e)  => Left(e)
+    }).fold(
       respErr => s"Response should succeed but returned the error $respErr".invalidNel,
       respMsg => new String(respMsg, StandardCharsets.UTF_8) isSameAs expected
     )
