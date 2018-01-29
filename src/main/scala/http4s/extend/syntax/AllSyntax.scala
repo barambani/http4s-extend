@@ -6,3 +6,4 @@ trait AllSyntax
   with    ErrorAdaptSyntax
   with    MonadErrorModuleSyntax
   with    CirceSyntax
+  with    ResponseVerificationSyntax
