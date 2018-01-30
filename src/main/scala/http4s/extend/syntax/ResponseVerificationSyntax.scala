@@ -31,7 +31,7 @@ final class EitherResultOps[E : ErrorInvariantMap[Throwable, ?]](result: Either[
   def verify[A : EntityDecoder[Either[E, ?], ?]](status: Status, check: A => Verified[A]): Verified[A] =
     result.fold(
       err => s"Should succeed but returned the error $err".invalidNel,
-      res => (res.status isSameAs status) andThen {
+      res => res.status isSameAs status andThen {
         _ => verifiedResponse[A](res, check)
       }
     )
@@ -39,7 +39,7 @@ final class EitherResultOps[E : ErrorInvariantMap[Throwable, ?]](result: Either[
   def verifyResponseText(status: Status, expected: String): Verified[String] =
     result.fold(
       err => s"Should succeed but returned the error $err".invalidNel,
-      res => (res.status isSameAs status) andThen {
+      res => res.status isSameAs status andThen {
         _ => verifiedResponseText(res, expected)
       }
     )
