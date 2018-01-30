@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets
 
 import cats.data.Validated
 import cats.instances.string._
-import cats.syntax.apply._
 import cats.syntax.eq._
 import cats.syntax.show._
 import cats.syntax.validated._
@@ -32,13 +31,17 @@ final class EitherResultOps[E : ErrorInvariantMap[Throwable, ?]](result: Either[
   def verify[A : EntityDecoder[Either[E, ?], ?]](status: Status, check: A => Verified[A]): Verified[A] =
     result.fold(
       err => s"Should succeed but returned the error $err".invalidNel,
-      res => (res.status isSameAs status, verifiedResponse[A](res, check)) mapN { (_, a) => a }
+      res => (res.status isSameAs status) andThen {
+        _ => verifiedResponse[A](res, check)
+      }
     )
 
   def verifyResponseText(status: Status, expected: String): Verified[String] =
     result.fold(
       err => s"Should succeed but returned the error $err".invalidNel,
-      res => (res.status isSameAs status, verifiedResponseText(res, expected)) mapN { (_, a) => a }
+      res => (res.status isSameAs status) andThen {
+        _ => verifiedResponseText(res, expected)
+      }
     )
 
   private def verifiedResponse[A : EntityDecoder[Either[E, ?], ?]](res: Response[Either[E, ?]], check: A => Verified[A]): Verified[A] =
