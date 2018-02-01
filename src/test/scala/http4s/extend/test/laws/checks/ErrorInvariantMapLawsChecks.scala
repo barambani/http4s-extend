@@ -1,4 +1,4 @@
-package laws.checks
+package http4s.extend.test.laws.checks
 
 import cats.Eq
 import cats.laws.discipline._
