@@ -19,6 +19,6 @@ libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.13"
 ### Dependencies ###
 For its own purpose is integration, Http4s Extend will bring into a using project some dependencies. Those are:
 
-|        | Http4s    | Monix    | Scalaz Concurrent | Cats (from Http4s) | Cats Effect (from Monix) | Circe (from Http4s) |
-| ------ |:---------:|:--------:|:-----------------:|:------------------:| :-----------------------:|:-------------------:|
-| 0.0.13 | 0.18.0-M9 | 3.0.0-M3 | 7.2.18            | 1.0.1              | 0.8                      | 0.9.0               |
+|        | Http4s    | Monix    | Scalaz Concurrent |
+| ------ |:---------:|:--------:|:-----------------:|
+| 0.0.13 | 0.18.0-M9 | 3.0.0-M3 | 7.2.18            |
