@@ -7,7 +7,9 @@ Http4s Extend is a small set of integration tools to help building http4s api th
 * provide some tools for decoupling the error type of http4s services' `MonadError` from `Throwable` allowing not to fix it in modules where there is no need for that
 * provide some helper modules for tests that are implemented over the `Either` Monad instead of `IO`.
 
-A basic, still descriptive, example that demonstrates some possible uses for Http4s Extend can be found [here](https://github.com/barambani/http4s-poc-api)  
+A basic, still descriptive, example that demonstrates some possible uses for Http4s Extend can be found [here](https://github.com/barambani/http4s-poc-api)
+
+**Note:** this project is in early alpha stage. Not usable in production.
 
 ### Using Http4s Extend
 Http4s Extend is available for Scala `2.11.x` and `2.12.x`. To use it create the dependency by adding the following to the sbt build
