@@ -1,8 +1,9 @@
 package http4s.extend.test
 
 import cats.tests.CatsSuite
-import http4s.extend.Model.ThrowableCompleteMessage
+import http4s.extend.Algebra.ThrowableCompleteMessage
 import http4s.extend.instances.errorInvariantMap._
+import http4s.extend.instances.invariant._
 import http4s.extend.test.Fixtures.TestError
 import http4s.extend.test.Fixtures.instances._
 import http4s.extend.test.laws.checks.ErrorInvariantMapLawsChecks

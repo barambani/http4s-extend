@@ -1,7 +1,7 @@
 package http4s.extend.instances
 
+import http4s.extend.Algebra.ThrowableCompleteMessage
 import http4s.extend.ErrorInvariantMap
-import http4s.extend.Model.ThrowableCompleteMessage
 import http4s.extend.util.ThrowableModule._
 
 trait ErrorInvariantMapInstances {
@@ -12,6 +12,6 @@ trait ErrorInvariantMapInstances {
         completeMessage
 
       def reverse: ThrowableCompleteMessage => Throwable =
-        wrapCompleteMessage
+        throwableOfMessage
     }
 }

@@ -14,4 +14,5 @@ package object syntax {
   object circe                extends CirceSyntax
   object responseVerification extends ResponseVerificationSyntax
   object eq                   extends EqSyntax
+  object invariant            extends InvariantSyntax
 }

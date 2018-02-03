@@ -4,8 +4,6 @@ import cats.syntax.flatMap._
 import cats.{FlatMap, Functor}
 import org.http4s.{HttpService, Request, Response}
 
-import scala.language.higherKinds
-
 trait Http4sServiceSyntax {
   implicit def httpServiceSyntax[F[_]](s: HttpService[F]): HttpServiceOps[F] = new HttpServiceOps(s)
 }

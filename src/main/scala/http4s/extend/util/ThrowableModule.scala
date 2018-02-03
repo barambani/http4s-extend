@@ -1,6 +1,6 @@
 package http4s.extend.util
 
-import http4s.extend.Model.ThrowableCompleteMessage
+import http4s.extend.Algebra.ThrowableCompleteMessage
 
 import scala.annotation.tailrec
 
@@ -8,10 +8,10 @@ object ThrowableModule {
 
   private val separator = "\n\rcaused by "
 
-  def wrapCompleteMessage: ThrowableCompleteMessage => Throwable =
-    xs => foldThrowable(xs.message.split(separator).toSeq map (new ThrowableCompleteMessage(_)))
+  def throwableOfMessage: ThrowableCompleteMessage => Throwable =
+    xs => foldedThrowable(xs.message.split(separator).toSeq map (new ThrowableCompleteMessage(_)))
 
-  def foldThrowable: Seq[ThrowableCompleteMessage] => Throwable =
+  def foldedThrowable: Seq[ThrowableCompleteMessage] => Throwable =
     xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(m.message, th) }
 
   def completeMessage: Throwable => ThrowableCompleteMessage =

@@ -1,6 +1,6 @@
 package http4s.extend.test.laws.instances
 
-import http4s.extend.Model.ThrowableCompleteMessage
+import http4s.extend.Algebra.ThrowableCompleteMessage
 import org.scalacheck.Arbitrary
 
 trait ArbitraryInstances {

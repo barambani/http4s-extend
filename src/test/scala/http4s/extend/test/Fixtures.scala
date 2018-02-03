@@ -1,23 +1,18 @@
 package http4s.extend.test
 
-import cats.Eq
+import cats.{Eq, Invariant}
+import http4s.extend.Algebra.ThrowableCompleteMessage
 import http4s.extend.ErrorInvariantMap
-import http4s.extend.Model.ThrowableCompleteMessage
+import http4s.extend.instances.errorInvariantMap._
+import http4s.extend.syntax.invariant._
 import http4s.extend.test.Fixtures.TestError
 import http4s.extend.test.laws.instances.EqInstances
-import http4s.extend.util.ThrowableModule.{completeMessage, wrapCompleteMessage}
 import org.scalacheck.{Arbitrary, Cogen}
 
 trait Fixtures {
 
-  def testErrorMap: ErrorInvariantMap[Throwable, TestError] =
-    new ErrorInvariantMap[Throwable, TestError] {
-      def direct: Throwable => TestError =
-        th => TestError(completeMessage(th))
-
-      def reverse: TestError => Throwable =
-        er => wrapCompleteMessage(er.error)
-    }
+  def testErrorMap(implicit ev: Invariant[ErrorInvariantMap[Throwable, ?]]): ErrorInvariantMap[Throwable, TestError] =
+    ErrorInvariantMap[Throwable, ThrowableCompleteMessage].imap(TestError)(_.error)
 }
 
 object Fixtures {
