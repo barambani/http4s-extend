@@ -9,7 +9,6 @@ import monix.eval.{Task => MonixTask}
 import monix.execution.Scheduler
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.higherKinds
 import scalaz.concurrent.{Task => ScalazTask}
 
 sealed trait ByNameNaturalTransformation[F[_], G[_]] {

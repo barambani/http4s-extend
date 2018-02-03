@@ -4,8 +4,6 @@ import cats.MonadError
 import http4s.extend.ErrorInvariantMap
 import http4s.extend.util.MonadErrorModule
 
-import scala.language.higherKinds
-
 trait MonadErrorModuleSyntax {
   implicit def monadErrorSyntax[F[_], E1](me: MonadError[F, E1]): MonadErrorOps[F, E1] = new MonadErrorOps(me)
 }

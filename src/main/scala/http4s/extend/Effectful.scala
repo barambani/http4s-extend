@@ -3,7 +3,6 @@ package http4s.extend
 import cats.Monad
 import cats.effect.{Effect, IO}
 
-import scala.language.higherKinds
 import scala.util.Either
 
 trait Effectful[F[_]] {

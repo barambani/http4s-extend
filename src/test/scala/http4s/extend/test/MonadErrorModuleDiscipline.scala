@@ -5,8 +5,9 @@ import cats.effect.IO
 import cats.effect.laws.discipline.arbitrary._
 import cats.laws.discipline.MonadErrorTests
 import cats.tests.CatsSuite
-import http4s.extend.Model.ThrowableCompleteMessage
+import http4s.extend.Algebra.ThrowableCompleteMessage
 import http4s.extend.instances.errorInvariantMap._
+import http4s.extend.instances.invariant._
 import http4s.extend.syntax.monadError._
 import http4s.extend.test.Fixtures.TestError
 import http4s.extend.test.Fixtures.instances._

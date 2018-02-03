@@ -5,7 +5,7 @@ import cats.effect.IO
 import cats.instances.string._
 import cats.syntax.either._
 import http4s.extend.ErrorAdapt
-import http4s.extend.Model.ThrowableCompleteMessage
+import http4s.extend.Algebra.ThrowableCompleteMessage
 import http4s.extend.syntax.eq._
 import http4s.extend.util.ThrowableModule._
 
