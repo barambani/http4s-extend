@@ -7,13 +7,12 @@ import cats.syntax.either._
 import http4s.extend.ErrorAdapt
 import http4s.extend.Model.ThrowableCompleteMessage
 import http4s.extend.syntax.eq._
-import http4s.extend.test.Fixtures
 import http4s.extend.util.ThrowableModule._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-trait EqInstances extends Fixtures {
+trait EqInstances {
 
   implicit def throwableCompleteMessageEq: Eq[ThrowableCompleteMessage] =
     Eq.by[ThrowableCompleteMessage, String](_.message)
