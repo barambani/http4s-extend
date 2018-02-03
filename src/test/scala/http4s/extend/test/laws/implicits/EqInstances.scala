@@ -1,6 +1,7 @@
 package http4s.extend.test.laws.implicits
 
 import cats.Eq
+import cats.effect.IO
 import cats.instances.string._
 import cats.syntax.either._
 import http4s.extend.ErrorAdapt
@@ -17,7 +18,7 @@ trait EqInstances extends Fixtures {
   implicit val testErrorEq: Eq[TestError] =
     Eq.by[TestError, String](_.error)
 
-  implicit def equalFuture[A: Eq](implicit ec: ExecutionContext): Eq[Future[A]] = {
+  implicit def futureEqual[A: Eq](implicit ec: ExecutionContext): Eq[Future[A]] = {
 
     def futureEither(fa: Future[A]): Future[Either[Throwable, A]] =
       ErrorAdapt[Future].attemptMapLeft(fa)(identity[Throwable])
@@ -30,4 +31,13 @@ trait EqInstances extends Fixtures {
         )
     }
   }
+
+  implicit def ioEqual[A: Eq]: Eq[IO[A]] =
+    new Eq[IO[A]] {
+      def eqv(x: IO[A], y: IO[A]): Boolean =
+        (for {
+          xv <- x.attempt
+          yv <- y.attempt
+        } yield xv === yv).unsafeRunSync()
+    }
 }

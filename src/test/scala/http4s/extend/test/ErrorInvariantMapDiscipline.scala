@@ -23,6 +23,13 @@ final class ErrorInvariantMapDiscipline extends CatsSuite with EqInstances with 
   /**
     * Verification
     */
-  checkAll("ErrorInvariantMapLawsChecks[Throwable, String]", ErrorInvariantMapLawsChecks[Throwable, String].errorInvariantMap)
-  checkAll("ErrorInvariantMapLawsChecks[Throwable, TestError]", ErrorInvariantMapLawsChecks[Throwable, TestError](testErrorMap).errorInvariantMap)
+  checkAll(
+    "ErrorInvariantMapLawsChecks[Throwable, String]",
+    ErrorInvariantMapLawsChecks[Throwable, String].errorInvariantMap
+  )
+
+  checkAll(
+    "ErrorInvariantMapLawsChecks[Throwable, TestError]",
+    ErrorInvariantMapLawsChecks[Throwable, TestError](testErrorMap).errorInvariantMap
+  )
 }

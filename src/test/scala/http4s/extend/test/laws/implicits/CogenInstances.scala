@@ -14,5 +14,4 @@ trait CogenInstances extends Fixtures {
 
   implicit def testErrorCogen(implicit SC: Cogen[String]): Cogen[TestError] =
     SC contramap (_.error)
-
 }

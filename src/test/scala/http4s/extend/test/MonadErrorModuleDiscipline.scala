@@ -3,6 +3,8 @@ package http4s.extend.test
 import java.util.concurrent.ForkJoinPool
 
 import cats.MonadError
+import cats.effect.IO
+import cats.effect.laws.discipline.arbitrary._
 import cats.laws.discipline.MonadErrorTests
 import cats.tests.CatsSuite
 import http4s.extend.ErrorInvariantMap
@@ -33,15 +35,37 @@ final class MonadErrorModuleDiscipline extends CatsSuite with EqInstances with C
   val stringAdapt: MonadError[Future, String] =
     MonadError[Future, Throwable].adaptErrorType[String]
 
-  val testErrorAdapt: MonadError[Future, TestError] =
+  val futureError: MonadError[Future, TestError] =
     MonadError[Future, Throwable].adaptErrorType[TestError](testErrorMap)
+
+  val ioError: MonadError[IO, TestError] =
+    MonadError[IO, Throwable].adaptErrorType[TestError](testErrorMap)
 
   /**
     * Verification
     */
-  checkAll("ErrorInvariantMapLawsChecks[Throwable, String]", ErrorInvariantMapLawsChecks[Throwable, String].errorInvariantMap)
-  checkAll("ErrorInvariantMapLawsChecks[Throwable, TestError]", ErrorInvariantMapLawsChecks[Throwable, TestError](testErrorMap).errorInvariantMap)
+  checkAll(
+    "ErrorInvariantMapLawsChecks[Throwable, String]",
+    ErrorInvariantMapLawsChecks[Throwable, String].errorInvariantMap
+  )
 
-  checkAll("MonadErrorTests[Future, String]", MonadErrorTests[Future, String](stringAdapt).monadError[String, Boolean, Int])
-  checkAll("MonadErrorTests[Future, TestError]", MonadErrorTests[Future, TestError](testErrorAdapt).monadError[Boolean, Int, String])
+  checkAll(
+    "ErrorInvariantMapLawsChecks[Throwable, TestError]",
+    ErrorInvariantMapLawsChecks[Throwable, TestError](testErrorMap).errorInvariantMap
+  )
+
+  checkAll(
+    "MonadErrorTests[Future, String]",
+    MonadErrorTests[Future, String](stringAdapt).monadError[String, Int, Double]
+  )
+
+  checkAll(
+    "MonadErrorTests[Future, TestError]",
+    MonadErrorTests[Future, TestError](futureError).monadError[Double, Int, String]
+  )
+
+  checkAll(
+    "MonadErrorTests[IO, TestError]",
+    MonadErrorTests[IO, TestError](ioError).monadError[Double, Int, String]
+  )
 }
