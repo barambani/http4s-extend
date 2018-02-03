@@ -7,3 +7,4 @@ trait AllSyntax
   with    MonadErrorModuleSyntax
   with    CirceSyntax
   with    ResponseVerificationSyntax
+  with    EqSyntax

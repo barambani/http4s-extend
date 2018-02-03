@@ -32,17 +32,17 @@ final class MonadErrorModuleDiscipline extends CatsSuite with EqInstances with C
         er => new Throwable(er.error)
     }
 
-  val stringAdapt: MonadError[Future, String] =
+  val futureMonadErrorWithString: MonadError[Future, String] =
     MonadError[Future, Throwable].adaptErrorType[String]
 
-  val futureError: MonadError[Future, TestError] =
+  val futureMonadError: MonadError[Future, TestError] =
     MonadError[Future, Throwable].adaptErrorType[TestError](testErrorMap)
 
-  val ioError: MonadError[IO, TestError] =
+  val ioMonadError: MonadError[IO, TestError] =
     MonadError[IO, Throwable].adaptErrorType[TestError](testErrorMap)
 
   /**
-    * Verification
+    * Error map verification
     */
   checkAll(
     "ErrorInvariantMapLawsChecks[Throwable, String]",
@@ -54,18 +54,21 @@ final class MonadErrorModuleDiscipline extends CatsSuite with EqInstances with C
     ErrorInvariantMapLawsChecks[Throwable, TestError](testErrorMap).errorInvariantMap
   )
 
+  /**
+    * MonadError verification
+    */
   checkAll(
     "MonadErrorTests[Future, String]",
-    MonadErrorTests[Future, String](stringAdapt).monadError[String, Int, Double]
+    MonadErrorTests[Future, String](futureMonadErrorWithString).monadError[String, Int, Double]
   )
 
   checkAll(
     "MonadErrorTests[Future, TestError]",
-    MonadErrorTests[Future, TestError](futureError).monadError[Double, Int, String]
+    MonadErrorTests[Future, TestError](futureMonadError).monadError[Double, Int, String]
   )
 
   checkAll(
     "MonadErrorTests[IO, TestError]",
-    MonadErrorTests[IO, TestError](ioError).monadError[Double, Int, String]
+    MonadErrorTests[IO, TestError](ioMonadError).monadError[Double, Int, String]
   )
 }

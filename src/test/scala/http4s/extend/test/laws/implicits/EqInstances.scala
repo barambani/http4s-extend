@@ -5,6 +5,7 @@ import cats.effect.IO
 import cats.instances.string._
 import cats.syntax.either._
 import http4s.extend.ErrorAdapt
+import http4s.extend.syntax.eq._
 import http4s.extend.test.Fixtures
 
 import scala.concurrent.duration._
@@ -34,10 +35,16 @@ trait EqInstances extends Fixtures {
 
   implicit def ioEqual[A: Eq]: Eq[IO[A]] =
     new Eq[IO[A]] {
-      def eqv(x: IO[A], y: IO[A]): Boolean =
-        (for {
-          xv <- x.attempt
-          yv <- y.attempt
-        } yield xv === yv).unsafeRunSync()
+      def eqv(x: IO[A], y: IO[A]): Boolean = {
+
+        val xv = Either.catchNonFatal(x.attempt.unsafeRunSync())
+        val yv = Either.catchNonFatal(y.attempt.unsafeRunSync())
+
+        (xv, yv) match {
+          case (Right(vl) , Right(vr))  => vl === vr
+          case (Left(el)  , Left(er))   => el === er
+          case _                        => false
+        }
+      }
     }
 }

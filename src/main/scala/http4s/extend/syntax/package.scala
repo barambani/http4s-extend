@@ -13,4 +13,5 @@ package object syntax {
   object httpService          extends Http4sServiceSyntax
   object circe                extends CirceSyntax
   object responseVerification extends ResponseVerificationSyntax
+  object eq                   extends EqSyntax
 }
