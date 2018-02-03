@@ -3,10 +3,10 @@ package http4s.extend.test
 import cats.{Eq, Invariant}
 import http4s.extend.Algebra.ThrowableCompleteMessage
 import http4s.extend.ErrorInvariantMap
+import http4s.extend.instances.eq._
 import http4s.extend.instances.errorInvariantMap._
 import http4s.extend.syntax.invariant._
 import http4s.extend.test.Fixtures.TestError
-import http4s.extend.test.laws.instances.EqInstances
 import org.scalacheck.{Arbitrary, Cogen}
 
 trait Fixtures {
@@ -19,7 +19,7 @@ object Fixtures {
 
   case class TestError(error: ThrowableCompleteMessage)
 
-  object instances extends EqInstances {
+  object instances {
 
     implicit def testErrorArb(implicit A: Arbitrary[ThrowableCompleteMessage]): Arbitrary[TestError] =
       Arbitrary { A.arbitrary map TestError }

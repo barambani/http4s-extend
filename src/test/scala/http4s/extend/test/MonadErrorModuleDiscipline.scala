@@ -6,18 +6,19 @@ import cats.effect.laws.discipline.arbitrary._
 import cats.laws.discipline.MonadErrorTests
 import cats.tests.CatsSuite
 import http4s.extend.Algebra.ThrowableCompleteMessage
+import http4s.extend.instances.eq._
 import http4s.extend.instances.errorInvariantMap._
 import http4s.extend.instances.invariant._
 import http4s.extend.syntax.monadError._
 import http4s.extend.test.Fixtures.TestError
 import http4s.extend.test.Fixtures.instances._
 import http4s.extend.test.laws.checks.ErrorInvariantMapLawsChecks
-import http4s.extend.test.laws.instances.{ArbitraryInstances, CogenInstances, EqInstances}
+import http4s.extend.test.laws.instances.{ArbitraryInstances, CogenInstances}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-final class MonadErrorModuleDiscipline extends CatsSuite with EqInstances with CogenInstances with ArbitraryInstances with Fixtures {
+final class MonadErrorModuleDiscipline extends CatsSuite with CogenInstances with ArbitraryInstances with Fixtures {
 
   /**
     * MonadError under test
