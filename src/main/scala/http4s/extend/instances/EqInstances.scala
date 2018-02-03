@@ -1,11 +1,11 @@
-package http4s.extend.test.laws.instances
+package http4s.extend.instances
 
 import cats.Eq
 import cats.effect.IO
 import cats.instances.string._
 import cats.syntax.either._
-import http4s.extend.ErrorAdapt
 import http4s.extend.Algebra.ThrowableCompleteMessage
+import http4s.extend.ErrorAdapt
 import http4s.extend.syntax.eq._
 import http4s.extend.util.ThrowableModule._
 
