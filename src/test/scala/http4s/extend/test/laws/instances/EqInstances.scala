@@ -1,23 +1,28 @@
-package http4s.extend.test.laws.implicits
+package http4s.extend.test.laws.instances
 
 import cats.Eq
 import cats.effect.IO
 import cats.instances.string._
 import cats.syntax.either._
 import http4s.extend.ErrorAdapt
+import http4s.extend.Model.ThrowableCompleteMessage
 import http4s.extend.syntax.eq._
 import http4s.extend.test.Fixtures
+import http4s.extend.util.ThrowableModule._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 trait EqInstances extends Fixtures {
 
-  implicit val throwableEq: Eq[Throwable] =
-    Eq.by[Throwable, String](_.getMessage)
+  implicit def throwableCompleteMessageEq: Eq[ThrowableCompleteMessage] =
+    Eq.by[ThrowableCompleteMessage, String](_.message)
 
-  implicit val testErrorEq: Eq[TestError] =
-    Eq.by[TestError, String](_.error)
+  implicit def throwableEq(implicit ev: Eq[ThrowableCompleteMessage]): Eq[Throwable] =
+    new Eq[Throwable]{
+      def eqv(x: Throwable, y: Throwable): Boolean =
+        ev.eqv(completeMessage(x), completeMessage(y))
+    }
 
   implicit def futureEqual[A: Eq](implicit ec: ExecutionContext): Eq[Future[A]] = {
 
