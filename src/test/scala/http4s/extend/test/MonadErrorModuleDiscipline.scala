@@ -1,52 +1,50 @@
 package http4s.extend.test
 
-import java.util.concurrent.ForkJoinPool
-
-import cats.MonadError
+import cats.{Eq, MonadError}
 import cats.effect.IO
 import cats.effect.laws.discipline.arbitrary._
 import cats.laws.discipline.MonadErrorTests
 import cats.tests.CatsSuite
-import http4s.extend.ErrorInvariantMap
+import http4s.extend.Model.ThrowableCompleteMessage
 import http4s.extend.instances.errorInvariantMap._
 import http4s.extend.syntax.monadError._
+import http4s.extend.test.Fixtures.TestError
 import http4s.extend.test.laws.checks.ErrorInvariantMapLawsChecks
-import http4s.extend.test.laws.implicits.{ArbitraryInstances, CogenInstances, EqInstances}
+import http4s.extend.test.laws.instances.{ArbitraryInstances, CogenInstances, EqInstances}
+import org.scalacheck.{Arbitrary, Cogen}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 final class MonadErrorModuleDiscipline extends CatsSuite with EqInstances with CogenInstances with ArbitraryInstances with Fixtures {
 
-  implicit val futureExecutionContext: ExecutionContext =
-    ExecutionContext.fromExecutor(new ForkJoinPool())
+  implicit def testErrorArb(implicit A: Arbitrary[ThrowableCompleteMessage]): Arbitrary[TestError] =
+    Arbitrary { A.arbitrary map TestError }
+
+  implicit def testErrorCogen(implicit ev: Cogen[ThrowableCompleteMessage]): Cogen[TestError] =
+    ev contramap (_.error)
+
+  implicit def testErrorEq: Eq[TestError] =
+    Eq.by[TestError, ThrowableCompleteMessage](_.error)
 
   /**
     * MonadError under test
     */
-  val testErrorMap: ErrorInvariantMap[Throwable, TestError] =
-    new ErrorInvariantMap[Throwable, TestError] {
-      def direct: Throwable => TestError =
-        th => TestError(th.getMessage)
+  def futureMonadErrorWithString: MonadError[Future, ThrowableCompleteMessage] =
+    MonadError[Future, Throwable].adaptErrorType[ThrowableCompleteMessage]
 
-      def reverse: TestError => Throwable =
-        er => new Throwable(er.error)
-    }
-
-  val futureMonadErrorWithString: MonadError[Future, String] =
-    MonadError[Future, Throwable].adaptErrorType[String]
-
-  val futureMonadError: MonadError[Future, TestError] =
+  def futureMonadError: MonadError[Future, TestError] =
     MonadError[Future, Throwable].adaptErrorType[TestError](testErrorMap)
 
-  val ioMonadError: MonadError[IO, TestError] =
+  def ioMonadError: MonadError[IO, TestError] =
     MonadError[IO, Throwable].adaptErrorType[TestError](testErrorMap)
 
   /**
     * Error map verification
     */
   checkAll(
-    "ErrorInvariantMapLawsChecks[Throwable, String]",
-    ErrorInvariantMapLawsChecks[Throwable, String].errorInvariantMap
+    "ErrorInvariantMapLawsChecks[Throwable, ThrowableCompleteMessage]",
+    ErrorInvariantMapLawsChecks[Throwable, ThrowableCompleteMessage].errorInvariantMap
   )
 
   checkAll(
@@ -58,8 +56,8 @@ final class MonadErrorModuleDiscipline extends CatsSuite with EqInstances with C
     * MonadError verification
     */
   checkAll(
-    "MonadErrorTests[Future, String]",
-    MonadErrorTests[Future, String](futureMonadErrorWithString).monadError[String, Int, Double]
+    "MonadErrorTests[Future, ThrowableCompleteMessage]",
+    MonadErrorTests[Future, ThrowableCompleteMessage](futureMonadErrorWithString).monadError[String, Int, Double]
   )
 
   checkAll(

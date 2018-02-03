@@ -1,5 +1,6 @@
-package http4s.extend.test.laws.implicits
+package http4s.extend.test.laws.instances
 
+import http4s.extend.Model.ThrowableCompleteMessage
 import http4s.extend.test.Fixtures
 import org.scalacheck.Cogen
 import org.scalacheck.rng.Seed
@@ -12,6 +13,6 @@ trait CogenInstances extends Fixtures {
   implicit def futureCogen[A : Cogen]: Cogen[Future[A]] =
     Cogen[Future[A]] { (seed: Seed, t: Future[A]) => Cogen[A].perturb(seed, Await.result(t, 1.second)) }
 
-  implicit def testErrorCogen(implicit SC: Cogen[String]): Cogen[TestError] =
-    SC contramap (_.error)
+  implicit def throwableCompleteMessageCogen(implicit ev: Cogen[String]): Cogen[ThrowableCompleteMessage] =
+    ev contramap (_.message)
 }
