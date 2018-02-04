@@ -5,14 +5,14 @@ import http4s.extend.ErrorInvariantMap
 
 object MonadErrorModule {
 
-  def adaptErrorType[F[_], E1, E2](me: MonadError[F, E1])(implicit EC: ErrorInvariantMap[E1, E2]): MonadError[F, E2] =
+  def adaptErrorType[F[_], E1, E2](me: MonadError[F, E1])(implicit ev: ErrorInvariantMap[E1, E2]): MonadError[F, E2] =
     new MonadError[F, E2] {
 
       def raiseError[A](e: E2): F[A] =
-        (me.raiseError[A] _ compose EC.reverse)(e)
+        (me.raiseError[A] _ compose ev.reverse)(e)
 
       def handleErrorWith[A](fa: F[A])(f: E2 => F[A]): F[A] =
-        me.handleErrorWith(fa)(f compose EC.direct)
+        me.handleErrorWith(fa)(f compose ev.direct)
 
       def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B] =
         me.flatMap(fa)(f)

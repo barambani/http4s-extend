@@ -16,10 +16,10 @@ object ThrowableModule {
 
   def completeMessage: Throwable => ThrowableCompleteMessage =
     th => new ThrowableCompleteMessage(
-      s"${ flatMessage(th) map (_.message) mkString separator }"
+      s"${ flatMessages(th) map (_.message) mkString separator }"
     )
 
-  def flatMessage: Throwable => Seq[ThrowableCompleteMessage] =
+  def flatMessages: Throwable => Seq[ThrowableCompleteMessage] =
     th => {
 
       @tailrec
