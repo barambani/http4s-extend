@@ -17,11 +17,8 @@ trait EqInstances {
   implicit def throwableCompleteMessageEq: Eq[ThrowableCompleteMessage] =
     Eq.by[ThrowableCompleteMessage, String](_.message)
 
-  implicit def throwableEq(implicit ev: Eq[ThrowableCompleteMessage]): Eq[Throwable] =
-    new Eq[Throwable]{
-      def eqv(x: Throwable, y: Throwable): Boolean =
-        ev.eqv(completeMessage(x), completeMessage(y))
-    }
+  implicit def throwableEq: Eq[Throwable] =
+    Eq.by[Throwable, ThrowableCompleteMessage](completeMessage)
 
   implicit def futureEqual[A: Eq](implicit ec: ExecutionContext): Eq[Future[A]] = {
 
