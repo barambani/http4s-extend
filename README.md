@@ -1,5 +1,6 @@
 # Http4s Extend
 [![Build Status](https://travis-ci.org/barambani/http4s-extend.svg?branch=master)](https://travis-ci.org/barambani/http4s-extend)
+[![codecov](https://codecov.io/gh/barambani/http4s-extend/branch/master/graph/badge.svg)](https://codecov.io/gh/barambani/http4s-extend)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.barambani/http4s-extend_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.barambani/http4s-extend_2.12)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/barambani/http4s-extend/blob/master/LICENSE)
 
