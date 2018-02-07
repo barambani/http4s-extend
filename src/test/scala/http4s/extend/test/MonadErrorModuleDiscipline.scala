@@ -5,7 +5,7 @@ import cats.effect.IO
 import cats.effect.laws.discipline.arbitrary._
 import cats.laws.discipline.MonadErrorTests
 import cats.tests.CatsSuite
-import http4s.extend.Algebra.ThrowableCompleteMessage
+import http4s.extend.Algebra.ExceptionMessage
 import http4s.extend.instances.eq._
 import http4s.extend.instances.errorInvariantMap._
 import http4s.extend.instances.invariant._
@@ -23,8 +23,8 @@ final class MonadErrorModuleDiscipline extends CatsSuite with CogenInstances wit
   /**
     * MonadError under test
     */
-  def futureMonadErrorWithString: MonadError[Future, ThrowableCompleteMessage] =
-    MonadError[Future, Throwable].adaptErrorType[ThrowableCompleteMessage]
+  def futureMonadErrorWithString: MonadError[Future, ExceptionMessage] =
+    MonadError[Future, Throwable].adaptErrorType[ExceptionMessage]
 
   def futureMonadError: MonadError[Future, TestError] =
     MonadError[Future, Throwable].adaptErrorType[TestError](testErrorMap)
@@ -37,7 +37,7 @@ final class MonadErrorModuleDiscipline extends CatsSuite with CogenInstances wit
     */
   checkAll(
     "ErrorInvariantMapLawsChecks[Throwable, ThrowableCompleteMessage]",
-    ErrorInvariantMapLawsChecks[Throwable, ThrowableCompleteMessage].errorInvariantMap
+    ErrorInvariantMapLawsChecks[Throwable, ExceptionMessage].errorInvariantMap
   )
 
   checkAll(
@@ -50,7 +50,7 @@ final class MonadErrorModuleDiscipline extends CatsSuite with CogenInstances wit
     */
   checkAll(
     "MonadErrorTests[Future, ThrowableCompleteMessage]",
-    MonadErrorTests[Future, ThrowableCompleteMessage](futureMonadErrorWithString).monadError[String, Int, Double]
+    MonadErrorTests[Future, ExceptionMessage](futureMonadErrorWithString).monadError[String, Int, Double]
   )
 
   checkAll(
