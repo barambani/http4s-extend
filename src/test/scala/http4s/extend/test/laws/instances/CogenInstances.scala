@@ -1,6 +1,6 @@
 package http4s.extend.test.laws.instances
 
-import http4s.extend.Algebra.ThrowableCompleteMessage
+import http4s.extend.Algebra.ExceptionMessage
 import org.scalacheck.Cogen
 import org.scalacheck.rng.Seed
 
@@ -12,6 +12,6 @@ trait CogenInstances {
   implicit def futureCogen[A : Cogen]: Cogen[Future[A]] =
     Cogen[Future[A]] { (seed: Seed, t: Future[A]) => Cogen[A].perturb(seed, Await.result(t, 1.second)) }
 
-  implicit def throwableCompleteMessageCogen(implicit ev: Cogen[String]): Cogen[ThrowableCompleteMessage] =
+  implicit def throwableCompleteMessageCogen(implicit ev: Cogen[String]): Cogen[ExceptionMessage] =
     ev contramap (_.message)
 }

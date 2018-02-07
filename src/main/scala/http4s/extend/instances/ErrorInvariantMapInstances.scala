@@ -1,17 +1,17 @@
 package http4s.extend.instances
 
-import http4s.extend.Algebra.ThrowableCompleteMessage
+import http4s.extend.Algebra.ExceptionMessage
 import http4s.extend.ErrorInvariantMap
 import http4s.extend.util.ThrowableModule._
 
 trait ErrorInvariantMapInstances {
 
-  implicit def throwableStringErrMap: ErrorInvariantMap[Throwable, ThrowableCompleteMessage] =
-    new ErrorInvariantMap[Throwable, ThrowableCompleteMessage] {
-      def direct: Throwable => ThrowableCompleteMessage =
+  implicit def throwableStringErrMap: ErrorInvariantMap[Throwable, ExceptionMessage] =
+    new ErrorInvariantMap[Throwable, ExceptionMessage] {
+      def direct: Throwable => ExceptionMessage =
         completeMessage
 
-      def reverse: ThrowableCompleteMessage => Throwable =
+      def reverse: ExceptionMessage => Throwable =
         throwableOfMessage
     }
 }
