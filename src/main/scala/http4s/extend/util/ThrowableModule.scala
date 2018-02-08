@@ -1,31 +1,31 @@
 package http4s.extend.util
 
-import http4s.extend.Algebra.ExceptionMessage
+import http4s.extend.ExceptionDisplayType._
 
 import scala.annotation.tailrec
 
 object ThrowableModule {
 
+  import ExceptionDisplay._
+
   private val separator = "\n\rcaused by "
 
-  def throwableOfMessage: ExceptionMessage => Throwable =
-    xs => foldedThrowable(xs.message.split(separator).toSeq map (new ExceptionMessage(_)))
+  def throwableOfMessage: ExceptionDisplay => Throwable =
+    xs => foldedThrowable(unwrap(xs).split(separator).toSeq map ExceptionDisplay.apply)
 
-  def foldedThrowable: Seq[ExceptionMessage] => Throwable =
-    xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(m.message, th) }
+  def foldedThrowable: Seq[ExceptionDisplay] => Throwable =
+    xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(unwrap(m), th) }
 
-  def completeMessage: Throwable => ExceptionMessage =
-    th => new ExceptionMessage(
-      s"${ flatMessage(th) map (_.message) mkString separator }"
-    )
+  def completeMessage: Throwable => ExceptionDisplay =
+    th => ExceptionDisplay(s"${ flatMessage(th) mkString separator }")
 
-  def flatMessage: Throwable => Seq[ExceptionMessage] =
+  def flatMessage: Throwable => Seq[ExceptionDisplay] =
     th => {
 
       @tailrec
-      def loop(c: Option[Throwable], acc: =>Vector[ExceptionMessage]): Vector[ExceptionMessage] =
+      def loop(c: Option[Throwable], acc: =>Vector[ExceptionDisplay]): Vector[ExceptionDisplay] =
         c match {
-          case Some(inTh) => loop(Option(inTh.getCause), acc :+ new ExceptionMessage(inTh.getMessage))
+          case Some(inTh) => loop(Option(inTh.getCause), acc :+ ExceptionDisplay(inTh.getMessage))
           case None       => acc
         }
 

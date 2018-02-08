@@ -4,8 +4,8 @@ import cats.Eq
 import cats.effect.IO
 import cats.instances.string._
 import cats.syntax.either._
-import http4s.extend.Algebra.ExceptionMessage
 import http4s.extend.ErrorAdapt
+import http4s.extend.ExceptionDisplayType._
 import http4s.extend.syntax.eq._
 import http4s.extend.util.ThrowableModule._
 
@@ -14,11 +14,11 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 trait EqInstances {
 
-  implicit def throwableCompleteMessageEq: Eq[ExceptionMessage] =
-    Eq.by[ExceptionMessage, String](_.message)
+  implicit def throwableCompleteMessageEq: Eq[ExceptionDisplay] =
+    Eq.by[ExceptionDisplay, String](ExceptionDisplay.unwrap)
 
   implicit def throwableEq: Eq[Throwable] =
-    Eq.by[Throwable, ExceptionMessage](completeMessage)
+    Eq.by[Throwable, ExceptionDisplay](completeMessage)
 
   implicit def futureEqual[A: Eq](implicit ec: ExecutionContext): Eq[Future[A]] = {
 

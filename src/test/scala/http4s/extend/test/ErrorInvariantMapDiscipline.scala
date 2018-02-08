@@ -1,7 +1,7 @@
 package http4s.extend.test
 
 import cats.tests.CatsSuite
-import http4s.extend.Algebra.ExceptionMessage
+import http4s.extend.ExceptionDisplayType._
 import http4s.extend.instances.eq._
 import http4s.extend.instances.errorInvariantMap._
 import http4s.extend.instances.invariant._
@@ -17,7 +17,7 @@ final class ErrorInvariantMapDiscipline extends CatsSuite with ArbitraryInstance
     */
   checkAll(
     "ErrorInvariantMapLawsChecks[Throwable, ThrowableCompleteMessage]",
-    ErrorInvariantMapLawsChecks[Throwable, ExceptionMessage].errorInvariantMap
+    ErrorInvariantMapLawsChecks[Throwable, ExceptionDisplay].errorInvariantMap
   )
 
   checkAll(
