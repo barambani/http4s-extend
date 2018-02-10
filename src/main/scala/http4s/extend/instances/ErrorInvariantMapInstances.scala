@@ -9,9 +9,9 @@ trait ErrorInvariantMapInstances {
   implicit def throwableStringErrMap: ErrorInvariantMap[Throwable, ExceptionDisplay] =
     new ErrorInvariantMap[Throwable, ExceptionDisplay] {
       def direct: Throwable => ExceptionDisplay =
-        completeMessage
+        fullDisplay
 
       def reverse: ExceptionDisplay => Throwable =
-        throwableOfMessage
+        throwableOf
     }
 }

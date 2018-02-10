@@ -1,9 +1,9 @@
 package http4s.extend.syntax
 
 import cats.MonadError
-import http4s.extend.ByNameNaturalTransformation.~~>
+import http4s.extend.ByNameNt.~~>
 
-trait ByNameNaturalTransformationSyntax {
+trait ByNameNtSyntax {
 
   implicit def byNameNtSyntax[F[_] : ?[_] ~~> G, G[_], A](fa: F[A]): ByNameNtOps[F, G, A] = new ByNameNtOps(fa)
 

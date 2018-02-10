@@ -10,16 +10,18 @@ object ThrowableModule {
 
   private val separator = "\n\rcaused by "
 
-  def throwableOfMessage: ExceptionDisplay => Throwable =
-    xs => foldedThrowable(unwrap(xs).split(separator).toSeq map ExceptionDisplay.apply)
+  def throwableOf: ExceptionDisplay => Throwable =
+    xs => throwableHierarchy {
+      unwrap(xs).split(separator).toSeq map ExceptionDisplay.apply
+    }
 
-  def foldedThrowable: Seq[ExceptionDisplay] => Throwable =
+  def throwableHierarchy: Seq[ExceptionDisplay] => Throwable =
     xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(unwrap(m), th) }
 
-  def completeMessage: Throwable => ExceptionDisplay =
-    th => ExceptionDisplay(s"${ flatMessage(th) mkString separator }")
+  def fullDisplay: Throwable => ExceptionDisplay =
+    th => ExceptionDisplay(s"${ flatMessages(th) mkString separator }")
 
-  def flatMessage: Throwable => Seq[ExceptionDisplay] =
+  def flatMessages: Throwable => Seq[ExceptionDisplay] =
     th => {
 
       @tailrec

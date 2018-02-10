@@ -2,7 +2,7 @@ package http4s.extend.syntax
 
 trait AllSyntax
   extends Http4sServiceSyntax
-  with    ByNameNaturalTransformationSyntax
+  with    ByNameNtSyntax
   with    ErrorAdaptSyntax
   with    MonadErrorModuleSyntax
   with    CirceSyntax
