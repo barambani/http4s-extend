@@ -18,7 +18,7 @@ trait EqInstances {
     Eq.by[ExceptionDisplay, String](ExceptionDisplay.unwrap)
 
   implicit def throwableEq: Eq[Throwable] =
-    Eq.by[Throwable, ExceptionDisplay](completeMessage)
+    Eq.by[Throwable, ExceptionDisplay](fullDisplay)
 
   implicit def futureEqual[A: Eq](implicit ec: ExecutionContext): Eq[Future[A]] = {
 

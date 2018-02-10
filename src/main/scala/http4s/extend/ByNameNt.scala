@@ -11,7 +11,7 @@ import monix.execution.Scheduler
 import scala.concurrent.{ExecutionContext, Future}
 import scalaz.concurrent.{Task => ScalazTask}
 
-sealed trait ByNameNaturalTransformation[F[_], G[_]] {
+sealed trait ByNameNt[F[_], G[_]] {
 
   def apply[A](fa: => F[A]): G[A]
 
@@ -19,23 +19,23 @@ sealed trait ByNameNaturalTransformation[F[_], G[_]] {
     λ[FunctionK[F, G]](apply(_))
 }
 
-object ByNameNaturalTransformation {
+object ByNameNt {
 
-  type ~~>[F[_], G[_]] = ByNameNaturalTransformation[F, G]
+  type ~~>[F[_], G[_]] = ByNameNt[F, G]
 
-  implicit def futureToIo(implicit ec: ExecutionContext): ByNameNaturalTransformation[Future, IO] =
-    new ByNameNaturalTransformation[Future, IO] {
+  implicit def futureToIo(implicit ec: ExecutionContext): ByNameNt[Future, IO] =
+    new ByNameNt[Future, IO] {
       def apply[A](fa: => Future[A]): IO[A] =
         IO.fromFuture(IO.eval(always(fa)))
     }
 
-  implicit def monixTaskToIo(implicit s: Scheduler): ByNameNaturalTransformation[MonixTask, IO] =
-    new ByNameNaturalTransformation[MonixTask, IO] {
+  implicit def monixTaskToIo(implicit s: Scheduler): ByNameNt[MonixTask, IO] =
+    new ByNameNt[MonixTask, IO] {
       def apply[A](fa: => MonixTask[A]): IO[A] = fa.toIO
     }
 
-  implicit def scalazTaskToIo: ByNameNaturalTransformation[ScalazTask, IO] =
-    new ByNameNaturalTransformation[ScalazTask, IO] {
+  implicit def scalazTaskToIo: ByNameNt[ScalazTask, IO] =
+    new ByNameNt[ScalazTask, IO] {
       def apply[A](fa: => ScalazTask[A]): IO[A] =
         Eval.always(
           Either.catchNonFatal(fa.unsafePerformSync).fold(
