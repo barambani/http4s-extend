@@ -13,9 +13,9 @@ object ExceptionDisplayType {
     new ExceptionDisplayImpl {
       type T = String
       override def apply(s: String) = s
-      override def unwrap(lbl: T) = lbl
-      override def subst[F[_]](value: F[String]): F[T] =
-        value.asInstanceOf[F[T]]
+      override def unwrap(t: T) = t
+      override def subst[F[_]](fs: F[String]): F[T] =
+        fs.asInstanceOf[F[T]]
     }
 
   type ExceptionDisplay = ExceptionDisplay.T
