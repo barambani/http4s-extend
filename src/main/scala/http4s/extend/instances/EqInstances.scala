@@ -4,10 +4,9 @@ import cats.Eq
 import cats.effect.IO
 import cats.instances.string._
 import cats.syntax.either._
-import http4s.extend.ErrorAdapt
-import http4s.extend.ExceptionDisplayType._
 import http4s.extend.syntax.eq._
 import http4s.extend.util.ThrowableModule._
+import http4s.extend.{ErrorAdapt, ExceptionDisplay}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}

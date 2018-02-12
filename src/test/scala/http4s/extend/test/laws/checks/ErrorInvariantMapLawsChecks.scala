@@ -8,7 +8,6 @@ import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Prop}
 import org.typelevel.discipline.Laws
 
-
 trait ErrorInvariantMapLawsChecks[E1, E2] extends Laws {
 
   def laws: ErrorInvariantMapLaws[E1, E2]

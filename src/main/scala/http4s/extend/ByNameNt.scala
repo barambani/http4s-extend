@@ -19,9 +19,7 @@ sealed trait ByNameNt[F[_], G[_]] {
     λ[FunctionK[F, G]](apply(_))
 }
 
-object ByNameNt {
-
-  type ~~>[F[_], G[_]] = ByNameNt[F, G]
+sealed trait ByNameNtInstances {
 
   implicit def futureToIo(implicit ec: ExecutionContext): ByNameNt[Future, IO] =
     new ByNameNt[Future, IO] {
@@ -44,4 +42,8 @@ object ByNameNt {
           )
         ).value
     }
+}
+
+object ByNameNt extends ByNameNtInstances {
+  type ~~>[F[_], G[_]] = ByNameNt[F, G]
 }

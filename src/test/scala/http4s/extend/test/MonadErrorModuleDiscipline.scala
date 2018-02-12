@@ -5,7 +5,7 @@ import cats.effect.IO
 import cats.effect.laws.discipline.arbitrary._
 import cats.laws.discipline.MonadErrorTests
 import cats.tests.CatsSuite
-import http4s.extend.ExceptionDisplayType._
+import http4s.extend.ExceptionDisplay
 import http4s.extend.instances.eq._
 import http4s.extend.instances.errorInvariantMap._
 import http4s.extend.instances.invariant._
