@@ -10,9 +10,7 @@ trait ErrorAdapt[F[_]] {
   def attemptMapLeft[E, A](fa: F[A])(errM: Throwable => E): F[Either[E, A]]
 }
 
-object ErrorAdapt {
-
-  @inline def apply[F[_]](implicit F: ErrorAdapt[F]): ErrorAdapt[F] = F
+sealed trait ErrorAdaptInstances {
 
   implicit def monixTaskErrorAdapt: ErrorAdapt[MonixTask] =
     new ErrorAdapt[MonixTask] {
@@ -31,4 +29,8 @@ object ErrorAdapt {
       def attemptMapLeft[E, A](fa: ScalazTask[A])(errM: Throwable => E): ScalazTask[Either[E,A]] =
         fa.attempt map (dj => (dj leftMap errM).toEither)
     }
+}
+
+object ErrorAdapt extends ErrorAdaptInstances {
+  @inline def apply[F[_]](implicit F: ErrorAdapt[F]): ErrorAdapt[F] = F
 }

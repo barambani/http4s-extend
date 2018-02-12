@@ -16,9 +16,7 @@ trait Effectful[F[_]] {
     suspend(F.pure(t))
 }
 
-object Effectful {
-
-  @inline def apply[F[_]](implicit F: Effectful[F]): Effectful[F] = F
+sealed trait EffectfulInstances {
 
   implicit val ioEffectfulOp: Effectful[IO] =
     new Effectful[IO] {
@@ -31,4 +29,8 @@ object Effectful {
       def suspend[A](t: => IO[A]): IO[A] =
         Effect[IO].suspend(t)
     }
+}
+
+object Effectful extends EffectfulInstances {
+  @inline def apply[F[_]](implicit F: Effectful[F]): Effectful[F] = F
 }

@@ -1,6 +1,6 @@
 package http4s.extend.util
 
-import http4s.extend.ExceptionDisplayType._
+import http4s.extend.ExceptionDisplay
 
 import scala.annotation.tailrec
 
