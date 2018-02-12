@@ -11,17 +11,17 @@ import org.scalacheck.{Arbitrary, Cogen}
 trait Fixtures {
 
   def testErrorMap(implicit ev: Invariant[ErrorInvariantMap[Throwable, ?]]): ErrorInvariantMap[Throwable, TestError] =
-    ErrorInvariantMap[Throwable, ExceptionDisplay].imap(TestError)(_.error)
+    ErrorInvariantMap[Throwable, ExceptionDisplay].imap(TestError.apply)(_.error)
 }
 
 object Fixtures {
 
   case class TestError(error: ExceptionDisplay)
 
-  object instances {
+  object TestError {
 
     implicit def testErrorArb(implicit A: Arbitrary[ExceptionDisplay]): Arbitrary[TestError] =
-      Arbitrary { A.arbitrary map TestError }
+      Arbitrary { A.arbitrary map TestError.apply }
 
     implicit def testErrorCogen(implicit ev: Cogen[ExceptionDisplay]): Cogen[TestError] =
       ev contramap (_.error)
