@@ -6,5 +6,5 @@ import org.scalacheck.Arbitrary
 trait ArbitraryInstances {
 
   implicit def throwableCompleteMessageArb(implicit A: Arbitrary[String]): Arbitrary[ExceptionDisplay] =
-    Arbitrary { A.arbitrary map ExceptionDisplay.apply }
+    Arbitrary { A.arbitrary map ExceptionDisplay.mk }
 }

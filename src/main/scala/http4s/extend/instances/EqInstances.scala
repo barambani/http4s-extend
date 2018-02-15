@@ -14,7 +14,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 trait EqInstances {
 
   implicit def throwableCompleteMessageEq: Eq[ExceptionDisplay] =
-    Eq.by[ExceptionDisplay, String](ExceptionDisplay.unwrap)
+    Eq.by[ExceptionDisplay, String](ExceptionDisplay.unMk)
 
   implicit def throwableEq: Eq[Throwable] =
     Eq.by[Throwable, ExceptionDisplay](fullDisplay)

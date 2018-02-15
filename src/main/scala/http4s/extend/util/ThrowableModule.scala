@@ -12,14 +12,14 @@ object ThrowableModule {
 
   def throwableOf: ExceptionDisplay => Throwable =
     xs => throwableHierarchy {
-      unwrap(xs).split(separator).toSeq map ExceptionDisplay.apply
+      unMk(xs).split(separator).toSeq map ExceptionDisplay.mk
     }
 
   def throwableHierarchy: Seq[ExceptionDisplay] => Throwable =
-    xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(unwrap(m), th) }
+    xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(unMk(m), th) }
 
   def fullDisplay: Throwable => ExceptionDisplay =
-    th => ExceptionDisplay(s"${ flatMessages(th) mkString separator }")
+    th => ExceptionDisplay.mk(s"${ flatMessages(th) mkString separator }")
 
   def flatMessages: Throwable => Seq[ExceptionDisplay] =
     th => {
@@ -27,7 +27,7 @@ object ThrowableModule {
       @tailrec
       def loop(c: Option[Throwable], acc: =>Vector[ExceptionDisplay]): Vector[ExceptionDisplay] =
         c match {
-          case Some(inTh) => loop(Option(inTh.getCause), acc :+ ExceptionDisplay(inTh.getMessage))
+          case Some(inTh) => loop(Option(inTh.getCause), acc :+ ExceptionDisplay.mk(inTh.getMessage))
           case None       => acc
         }
 
