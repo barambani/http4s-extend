@@ -17,7 +17,7 @@ A basic, still descriptive, example that demonstrates some possible uses for Htt
 ### Using Http4s Extend
 Http4s Extend is available for Scala `2.11.x` and `2.12.x`. To use it create the dependency by adding the following to the sbt build
 ```scala
-libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.16"
+libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.17"
 ```
 **Note:** a sample configuration can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/build.sbt) where the dependencies are taken from [here](https://github.com/barambani/http4s-poc-api/blob/master/project/Dependencies.scala)
 
@@ -26,4 +26,4 @@ For its own purpose is integration, Http4s Extend will bring into a using projec
 
 |        | Http4s    | Monix    | Scalaz Concurrent |
 | ------ |:---------:|:--------:|:-----------------:|
-| 0.0.16 | 0.18.0    | 3.0.0-M3 | 7.2.19            |
+| 0.0.17 | 0.18.0    | 3.0.0-M3 | 7.2.19            |
