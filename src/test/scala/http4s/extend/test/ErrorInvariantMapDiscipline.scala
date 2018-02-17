@@ -11,9 +11,6 @@ import http4s.extend.test.laws.instances.ArbitraryInstances
 
 final class ErrorInvariantMapDiscipline extends CatsSuite with ArbitraryInstances with Fixtures {
 
-  /**
-    * Verification
-    */
   checkAll(
     "ErrorInvariantMapLawsChecks[Throwable, ThrowableCompleteMessage]",
     ErrorInvariantMapLawsChecks[Throwable, ExceptionDisplay].errorInvariantMap

@@ -8,7 +8,7 @@ import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Prop}
 import org.typelevel.discipline.Laws
 
-trait ErrorInvariantMapLawsChecks[E1, E2] extends Laws {
+sealed trait ErrorInvariantMapLawsChecks[E1, E2] extends Laws {
 
   def laws: ErrorInvariantMapLaws[E1, E2]
 
@@ -33,7 +33,7 @@ trait ErrorInvariantMapLawsChecks[E1, E2] extends Laws {
 
 object ErrorInvariantMapLawsChecks {
 
-  @inline def apply[E1, E2](implicit FE: ErrorInvariantMap[E1, E2]): ErrorInvariantMapLawsChecks[E1, E2] =
+  @inline def apply[E1, E2](implicit ev: ErrorInvariantMap[E1, E2]): ErrorInvariantMapLawsChecks[E1, E2] =
     new ErrorInvariantMapLawsChecks[E1, E2] {
       def laws: ErrorInvariantMapLaws[E1, E2] = ErrorInvariantMapLaws[E1, E2]
     }
