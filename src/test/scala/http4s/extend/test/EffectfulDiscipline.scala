@@ -18,7 +18,7 @@ final class EffectfulDiscipline extends CatsSuite with EqInstances {
     ExecutionContext.fromExecutor(new ForkJoinPool())
 
   checkAll(
-    "MonadErrorTests[Future, Throwable]",
+    "MonadErrorTests[IO, Throwable]",
     MonadErrorTests[IO, Throwable].monadError[String, Int, Double]
   )
 
