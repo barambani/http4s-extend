@@ -6,6 +6,12 @@ import cats.{Apply, MonadError, Semigroupal}
 import scala.concurrent.ExecutionContext
 import scala.util.Either
 
+/**
+  * suspend, runAsync, and async wrap the equivalent functions in cats.effect.Effect[F].
+  * parMap2 and parMap3, parTupled2 and parTupled3 describe the parallel execution of F[_]
+  * in parallel. The IO instance is implemented in terms of fs2 async.start. This bit will
+  * be simplified a lot when an instance for cats Parallel wil be available to the public.
+  */
 trait Effectful[F[_]] {
 
   val monadError: MonadError[F, Throwable]
