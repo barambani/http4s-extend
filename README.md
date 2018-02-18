@@ -7,6 +7,7 @@
 
 Http4s Extend is a small set of integration tools to help building http4s api that depend on third party libraries. The main features are:
 * facilitate the transformation of dependencies' abstractions for effectful computations
+* provide an easy to use abstraction for parallel execution of computaions based on fs2 async. This will probably be removed as soon as the IO instance for the *cats* `Parallel` type class will be available to the public
 * provide some tools to decouple the error type of http4s services' `MonadError` from `Throwable` allowing not to fix it in modules where there is no need for that
 * provide some helper modules for tests that are implemented over the `Either` Monad instead of `IO`.
 
@@ -19,7 +20,7 @@ Http4s Extend is available for Scala `2.11.x` and `2.12.x`. To use it create the
 ```scala
 libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.18"
 ```
-**Note:** a sample configuration can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/build.sbt) where the dependencies are taken from [here](https://github.com/barambani/http4s-poc-api/blob/master/project/Dependencies.scala)
+a sample configuration can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/build.sbt) where the dependencies are taken from [here](https://github.com/barambani/http4s-poc-api/blob/master/project/Dependencies.scala)
 
 ### Dependencies ###
 For its own purpose is integration, Http4s Extend will bring into a using project some dependencies. Those are:
