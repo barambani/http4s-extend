@@ -7,8 +7,8 @@
 
 Http4s Extend is a small set of integration tools to help building http4s api that depend on third party libraries. The main features are:
 * facilitate the transformation of dependencies' abstractions for effectful computations
-* provide an easy to use abstraction for parallel execution of computaions based on fs2 async. This will probably be removed as soon as the `IO` instance for the *cats* `Parallel` type class will be available to the public
-* provide some tools to decouple the error type of http4s services' `MonadError` from `Throwable` allowing not to fix it in modules where there is no need for that
+* [Parallel execution](https://github.com/barambani/http4s-extend#parallel-execution): an easy to use abstraction for parallel execution of computaions based on fs2 async. This will probably be removed as soon as the `IO` instance for the *cats* `Parallel` type class will be available to the public
+* [MonadError error adapter](https://github.com/barambani/http4s-extend#monaderror-error-adapter): tools to decouple the error type of http4s services' `MonadError` from `Throwable` allowing not to fix it in modules where there is no need for that
 * provide some helper modules for tests that are implemented over the `Either` Monad instead of `IO`.
 
 A basic, still descriptive, example that demonstrates some possible uses for Http4s Extend can be found [here](https://github.com/barambani/http4s-poc-api)
