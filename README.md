@@ -22,9 +22,58 @@ libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.18"
 ```
 a sample configuration can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/build.sbt) where the dependencies are taken from [here](https://github.com/barambani/http4s-poc-api/blob/master/project/Dependencies.scala)
 
-### Dependencies ###
+### Dependencies
 For its own purpose is integration, Http4s Extend will bring into a using project some dependencies. Those are:
 
 |        | Http4s    | Monix    | Scalaz Concurrent |
 | ------ |:---------:|:--------:|:-----------------:|
 | 0.0.18 | 0.18.0    | 3.0.0-M3 | 7.2.19            |
+
+## Examples
+### Parallel execution
+When sections of the computation can be completed in parallel `parTupled2` or `parTupled3` may help. They are defined in the `ParEffectful[F[_]]` type class in term of `parMap2` as
+```scala
+trait ParEffectful[F[_]] {
+
+  val semigroupalEvidence: Semigroupal[F]
+
+  def parMap2[A, B, R](fa: F[A], fb: F[B])(f: (A, B) => R): F[R]
+
+  def parMap3[A, B, C, R](fa: F[A], fb: F[B], fc: F[C])(f: (A, B, C) => R): F[R] =
+    parMap2(fa, semigroupalEvidence.product(fb, fc))((a, b) => f(a, b._1, b._2))
+
+  def parTupled2[A, B, R](fa: F[A], fb: F[B]): F[(A, B)] =
+    parMap2(fa, fb)(Tuple2.apply)
+
+  def parTupled3[A, B, C, R](fa: F[A], fb: F[B], fc: F[C]): F[(A, B, C)] =
+    parMap3(fa, fb, fc)(Tuple3.apply)
+}
+```
+and they model parallel tupling in the context `F[_]`. The `cats.effect.IO` instance provided for them will run the
+effects using `fs2.async`
+```scala
+val composedApply = Apply[IO] compose Apply[IO]
+
+def parMap2[A, B, R](fa: IO[A], fb: IO[B])(f: (A, B) => R): IO[R] =
+  composedApply.map2(fs2.async.start(fa), fs2.async.start(fb))(f) flatMap identity
+```
+this will make code like the one below easy to write without incurring in the *ambiguous implicits* problem that afflicts the `cats.effect.Effect[F[_]]` hierarchy when used with other *monads* in *Mtl* style. Notice in fact that we are already requiring `F[_] : MonadError[?[_], ApiError]` so requiring also an `Effect[F]` evidence needed by `fs2.async` will brake the compilation because they will both try to bring in instances for `MonadError` and all the supertypes. The trick here is that we give up on the modelling power of `Effect[F]` and we just provide evidence that we can run things in parallel delegating the safety of the computation to the implementation. We will need `Effect` only when we will need to materialize an instance for the effect we chose (`IO` in this case).
+```scala
+
+final case class PriceService[F[_] : MonadError[?[_], ApiError]](dep: Dependencies[F], logger: Logger[F])(implicit ev: ParEffectful[F]) {
+
+  def userFor(userId: UserId): F[User] = ???
+  def preferencesFor(userId: UserId): F[UserPreferences] = ???
+  def productsFor(productIds: Seq[ProductId]): F[List[Product]] = ???
+
+  def prices(userId: UserId, productIds: Seq[ProductId]): F[Seq[Price]] =
+    for {
+      retrievalResult               <- ev.parTupled3(userFor(userId), productsFor(productIds), preferencesFor(userId))
+      (user, products, preferences) =  retrievalResult
+      productsPrices                <- priceCalculator.finalPrices(user, products, preferences)
+    } yield productsPrices
+}
+```
+A full running exmple of the above can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/src/main/scala/service/PriceService.scala#L12).
+
+**Note:** as soon as the `cats.effect.IO` instance for `cats.Parallel` will be available to the public this code will probably change.
