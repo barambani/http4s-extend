@@ -3,33 +3,32 @@ package http4s.extend.syntax
 import java.nio.charset.StandardCharsets
 
 import cats.data.Validated
+import cats.effect.IO
 import cats.instances.string._
 import cats.syntax.eq._
 import cats.syntax.show._
-import cats.syntax.validated._
 import cats.{Eq, Show}
-import http4s.extend.ErrorInvariantMap
-import http4s.extend.instances.sync._
-import http4s.extend.syntax.responseVerification._
 import org.http4s.{EntityDecoder, Response, Status}
 
-import scala.util.{Either, Right}
+import scala.util.Right
 
 trait ResponseVerificationSyntax {
 
   implicit def verifiedSyntax[A : Eq : Show](a: A) = new VerifiedOps(a)
   implicit def verifiedOptionSyntax[A : Eq : Show](a: Option[A]) = new VerifiedOptionOps(a)
 
-  implicit def responseVerificationSyntax[E : ErrorInvariantMap[Throwable, ?]](result: Either[E, Response[Either[E, ?]]]) =
-    new EitherResultOps(result)
+  implicit def responseVerificationSyntax(response: IO[Response[IO]]) =
+    new IoResponseResultOps(response)
 }
 
-final class EitherResultOps[E : ErrorInvariantMap[Throwable, ?]](result: Either[E, Response[Either[E, ?]]]) {
+final class IoResponseResultOps(response: IO[Response[IO]]) {
 
+  import cats.syntax.validated._
+  import http4s.extend.syntax.responseVerification._
   import org.http4s.Http4s._
 
-  def verify[A : EntityDecoder[Either[E, ?], ?]](status: Status, check: A => Verified[A]): Verified[A] =
-    result.fold(
+  def verify[A : EntityDecoder[IO, ?]](status: Status, check: A => Verified[A]): Verified[A] =
+    response.attempt.unsafeRunSync().fold(
       err => s"Should succeed but returned the error $err".invalidNel,
       res => res.status isSameAs status andThen {
         _ => verifiedResponse[A](res, check)
@@ -37,21 +36,21 @@ final class EitherResultOps[E : ErrorInvariantMap[Throwable, ?]](result: Either[
     )
 
   def verifyResponseText(status: Status, expected: String): Verified[String] =
-    result.fold(
+    response.attempt.unsafeRunSync().fold(
       err => s"Should succeed but returned the error $err".invalidNel,
       res => res.status isSameAs status andThen {
         _ => verifiedResponseText(res, expected)
       }
     )
 
-  private def verifiedResponse[A : EntityDecoder[Either[E, ?], ?]](res: Response[Either[E, ?]], check: A => Verified[A]): Verified[A] =
-    res.as[A].fold(
+  private def verifiedResponse[A : EntityDecoder[IO, ?]](res: Response[IO], check: A => Verified[A]): Verified[A] =
+    res.as[A].attempt.unsafeRunSync().fold(
       respErr => s"Response should succeed but returned the error $respErr".invalidNel,
       respRes => check(respRes)
     )
 
-  private def verifiedResponseText[A](res: Response[Either[E, ?]], expected: String): Verified[String] =
-    (res.body.compile.toVector match {
+  private def verifiedResponseText[A](res: Response[IO], expected: String): Verified[String] =
+    (res.body.compile.toVector.attempt.unsafeRunSync() match {
       case Right(b) => Right(b.toArray)
       case Left(e)  => Left(e)
     }).fold(
