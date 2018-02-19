@@ -1,18 +1,11 @@
 package http4s.extend.test
 
-import cats.{Eq, Invariant}
+import cats.Eq
+import http4s.extend.ExceptionDisplay
 import http4s.extend.instances.eq._
-import http4s.extend.instances.errorInvariantMap._
-import http4s.extend.syntax.invariant._
-import http4s.extend.test.Fixtures.TestError
-import http4s.extend.{ErrorInvariantMap, ExceptionDisplay}
 import org.scalacheck.{Arbitrary, Cogen}
 
-trait Fixtures {
-
-  def testErrorMap(implicit ev: Invariant[ErrorInvariantMap[Throwable, ?]]): ErrorInvariantMap[Throwable, TestError] =
-    ErrorInvariantMap[Throwable, ExceptionDisplay].imap(TestError.apply)(_.error)
-}
+trait Fixtures
 
 object Fixtures {
 
