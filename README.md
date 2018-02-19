@@ -77,3 +77,58 @@ final case class PriceService[F[_] : MonadError[?[_], ApiError]](dep: Dependenci
 A full running exmple of the above can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/src/main/scala/service/PriceService.scala#L12).
 
 **Note:** as soon as the `cats.effect.IO` instance for `cats.Parallel` will be available to the public this code will probably change as it should provide another solution to the problem being independent from `Effect`.
+
+### MonadError error adapter
+There are cases when doesn't make a lot of sense to model failures with `Throwable`. Sometimes it might just be more accurate to define a custom hierarchy that describe them speaking the language of the domain at hand and possibly fixes this language in the types. This might be especially true in the core of the api where the computation effects and the *impure* details of the interaction with the runtime are still abstracted over. There is really no place for throwable things there. `MonadError` already provides an abstraction to express the fact that a context `F[_]` can possibly be in a failing state. Unfortunately though, whenever `MonadError` is used with `cats.effect.IO` the error type is fixed to `Throwable` and there is no easy way to translate it to something else. In such cases something like `adaptErrorType` could be used. It is defined as
+```scala
+def adaptErrorType[F[_], E1, E2](me: MonadError[F, E1])(implicit EC: ErrorInvariantMap[E1, E2]): MonadError[F, E2] =
+  new MonadError[F, E2] {
+    def raiseError[A](e: E2): F[A] =
+      (me.raiseError[A] _ compose EC.reverse)(e)
+
+    def handleErrorWith[A](fa: F[A])(f: E2 => F[A]): F[A] =
+      me.handleErrorWith(fa)(f compose EC.direct)
+
+    def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B] =
+      me.flatMap(fa)(f)
+
+    def tailRecM[A, B](a: A)(f: A => F[Either[A, B]]): F[B] =
+      me.tailRecM(a)(f)
+
+    def pure[A](x: A): F[A] =
+      me.pure(x)
+  }
+```
+As can be noticed, this definition says that `adaptErrorType` can adapt the error as long as it exists a way to map `E1` to `E2` and back. This existence is expressed by the evidence of an `ErrorInvariantMap[E1, E2]` that is defined as
+```scala
+trait ErrorInvariantMap[E1, E2] {
+  def direct: E1 => E2
+  def reverse: E2 => E1
+}
+```
+An example of how to use `adaptErrorType` could be
+```scala
+def ioApiError[E](implicit ev: ErrorInvariantMap[Throwable, E]): MonadError[IO, E] =
+  MonadError[IO, Throwable].adaptErrorType[E]
+```
+where an instance of `MonadError[IO, E]` is created adapting from `MonadError[IO, Throwable]`. The error map between the two could be written as
+```scala
+def throwableToApiError(implicit ev: Invariant[ErrorInvariantMap[Throwable, ?]]): ErrorInvariantMap[Throwable, ApiError] =
+  ErrorInvariantMap[Throwable, ExceptionDisplay].imap[ApiError](UnknownFailure.apply)(ae => ExceptionDisplay.mk(ae.message))
+```
+where an instance for `Invariant[ErrorInvariantMap[Throwable, ?]]` is provided and is defined as
+```scala
+implicit def errorMapInvariant[E]: Invariant[ErrorInvariantMap[E, ?]] =
+  new Invariant[ErrorInvariantMap[E, ?]] {
+
+    def imap[A, B](fa: ErrorInvariantMap[E, A])(f: A => B)(g: B => A): ErrorInvariantMap[E, B] =
+      new ErrorInvariantMap[E, B] {
+        def direct: E => B =
+          f compose fa.direct
+
+        def reverse: B => E =
+          fa.reverse compose g
+      }
+  }
+```
+Please see [here](https://github.com/barambani/http4s-poc-api/blob/master/src/main/scala/errors/Errors.scala#L17) for a complete working example together with a possible error hierarchy. In the example the type `ExceptionDisplay` and the `ThrowableModule` util are also shown. They are not needed for the mechanism to work, they just help in dumping a full stack of nested `Throwable` into a `String` and back.
