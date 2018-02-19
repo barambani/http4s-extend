@@ -76,4 +76,4 @@ final case class PriceService[F[_] : MonadError[?[_], ApiError]](dep: Dependenci
 ```
 A full running exmple of the above can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/src/main/scala/service/PriceService.scala#L12).
 
-**Note:** as soon as the `cats.effect.IO` instance for `cats.Parallel` will be available to the public this code will probably change.
+**Note:** as soon as the `cats.effect.IO` instance for `cats.Parallel` will be available to the public this code will probably change as it should provide another solution to the problem being independent from `Effect`.
