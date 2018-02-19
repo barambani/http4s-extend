@@ -116,7 +116,18 @@ where an instance of `MonadError[IO, E]` is created adapting from `MonadError[IO
 def throwableToApiError(implicit ev: Invariant[ErrorInvariantMap[Throwable, ?]]): ErrorInvariantMap[Throwable, ApiError] =
   ErrorInvariantMap[Throwable, ExceptionDisplay].imap[ApiError](UnknownFailure.apply)(ae => ExceptionDisplay.mk(ae.message))
 ```
-where an instance for `Invariant[ErrorInvariantMap[Throwable, ?]]` is provided and is defined as
+where instances for `ErrorInvariantMap[Throwable, ExceptionDisplay]` and `Invariant[ErrorInvariantMap[Throwable, ?]]` are provided and are defined as
+```scala
+implicit def throwableStringErrMap: ErrorInvariantMap[Throwable, ExceptionDisplay] =
+  new ErrorInvariantMap[Throwable, ExceptionDisplay] {
+    def direct: Throwable => ExceptionDisplay =
+      fullDisplay
+
+    def reverse: ExceptionDisplay => Throwable =
+      throwableOf
+  }
+```
+and
 ```scala
 implicit def errorMapInvariant[E]: Invariant[ErrorInvariantMap[E, ?]] =
   new Invariant[ErrorInvariantMap[E, ?]] {
