@@ -16,13 +16,13 @@ trait ParEffectful[F[_]] {
 
   def parMap2[A, B, R](fa: =>F[A], fb: =>F[B])(f: (A, B) => R): F[R]
 
-  def parMap3[A, B, C, R](fa: F[A], fb: F[B], fc: F[C])(f: (A, B, C) => R): F[R] =
+  def parMap3[A, B, C, R](fa: =>F[A], fb: =>F[B], fc: =>F[C])(f: (A, B, C) => R): F[R] =
     parMap2(fa, parMap2(fb, fc)(Tuple2.apply))((a, bc) => f(a, bc._1, bc._2))
 
-  def parTupled2[A, B, R](fa: F[A], fb: F[B]): F[(A, B)] =
+  def parTupled2[A, B, R](fa: =>F[A], fb: =>F[B]): F[(A, B)] =
     parMap2(fa, fb)(Tuple2.apply)
 
-  def parTupled3[A, B, C, R](fa: F[A], fb: F[B], fc: F[C]): F[(A, B, C)] =
+  def parTupled3[A, B, C, R](fa: =>F[A], fb: =>F[B], fc: =>F[C]): F[(A, B, C)] =
     parMap3(fa, fb, fc)(Tuple3.apply)
 }
 
