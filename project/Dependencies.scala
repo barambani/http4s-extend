@@ -11,7 +11,7 @@ object Dependencies {
   private val scalaCheckVersion   = "1.13.5"
   private val catsEffectLaws      = "0.8"
 
-  private val kindProjectorVersion = "0.9.4"
+  private val kindProjectorVersion = "0.9.6"
 
   val externalDependencies: Seq[ModuleID] = Seq(
     "org.http4s"          %% "http4s-dsl"           % http4sVersion   withSources(),
