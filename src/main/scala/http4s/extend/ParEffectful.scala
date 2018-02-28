@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
   * be simplified a lot when an instance for cats Parallel wil be available to the public
   */
 trait ParEffectful[F[_]] {
-  def parMap[A, B, R](fa: =>F[A], fb: =>F[B])(f: (A, B) => R): F[R]
+  def parMap2[A, B, R](fa: =>F[A], fb: =>F[B])(f: (A, B) => R): F[R]
 }
 
 sealed trait ParEffectfulInstances {
@@ -23,7 +23,7 @@ sealed trait ParEffectfulInstances {
 
       val evidence = Effect[IO]
 
-      def parMap[A, B, R](fa: =>IO[A], fb: =>IO[B])(f: (A, B) => R): IO[R] =
+      def parMap2[A, B, R](fa: =>IO[A], fb: =>IO[B])(f: (A, B) => R): IO[R] =
         (fs2.async.start(fa), fs2.async.start(fb)) mapN {
           (ioa, iob) =>
             evidence.rethrow(
@@ -41,13 +41,13 @@ sealed trait ParEffectfulInstances {
 sealed trait ParEffectfulFunctions {
 
   def parMap2[F[_], A, B, R](fa: =>F[A], fb: =>F[B])(f: (A, B) => R)(implicit ev: ParEffectful[F]): F[R] =
-    ev.parMap(fa, fb)(f)
+    ev.parMap2(fa, fb)(f)
 
   def parTupled2[F[_], A, B](fa: =>F[A], fb: =>F[B])(implicit ev: ParEffectful[F]): F[(A, B)] =
-    ev.parMap(fa, fb)(Tuple2.apply)
+    ev.parMap2(fa, fb)(Tuple2.apply)
 
   def parMap3[F[_], A, B, C, R](fa: =>F[A], fb: =>F[B], fc: =>F[C])(f: (A, B, C) => R)(implicit ev: ParEffectful[F]): F[R] =
-    ev.parMap(fa, parMap2(fb, fc)(Tuple2.apply))((a, bc) => f(a, bc._1, bc._2))
+    ev.parMap2(fa, parMap2(fb, fc)(Tuple2.apply))((a, bc) => f(a, bc._1, bc._2))
 
   def parTupled3[F[_], A, B, C](fa: =>F[A], fb: =>F[B], fc: =>F[C])(implicit ev: ParEffectful[F]): F[(A, B, C)] =
     parMap3(fa, fb, fc)(Tuple3.apply)
