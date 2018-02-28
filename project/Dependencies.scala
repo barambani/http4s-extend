@@ -9,7 +9,7 @@ object Dependencies {
 
   private val catsTestKitVersion  = "1.0.1"
   private val scalaCheckVersion   = "1.13.5"
-  private val catsEffectLaws      = "0.8"
+  private val catsEffectLaws      = "0.9"
 
   private val kindProjectorVersion = "0.9.6"
 
