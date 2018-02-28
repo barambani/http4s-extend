@@ -7,3 +7,4 @@ trait AllSyntax
   with    CirceSyntax
   with    ResponseVerificationSyntax
   with    EqSyntax
+  with    ParEffectfulSyntax
