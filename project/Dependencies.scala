@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
 
-  private val http4sVersion     = "0.18.1"
+  private val http4sVersion     = "0.18.2"
   private val monixVersion      = "3.0.0-M3"
   private val scalazVersion     = "7.2.20"
   private val catsLawsVersion   = "1.0.1"
