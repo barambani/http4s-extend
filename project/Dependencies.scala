@@ -10,7 +10,7 @@ object Dependencies {
 
     private[Dependencies] val catsTestKit     = "1.0.1"
     private[Dependencies] val scalaCheck      = "1.13.5"
-    private[Dependencies] val catsEffectLaws  = "0.9"
+    private[Dependencies] val catsEffectLaws  = "0.10"
 
     private[Dependencies] val kindProjector = "0.9.6"
   }
