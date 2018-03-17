@@ -2,8 +2,8 @@
 [![Build Status](https://travis-ci.org/barambani/http4s-extend.svg?branch=master)](https://travis-ci.org/barambani/http4s-extend)
 [![codecov](https://codecov.io/gh/barambani/http4s-extend/branch/master/graph/badge.svg)](https://codecov.io/gh/barambani/http4s-extend)
 [![scalaindex](https://img.shields.io/badge/scalaindex-http4s--extend-orange.svg)](https://index.scala-lang.org/barambani/http4s-extend/http4s-extend)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.barambani/http4s-extend_2.11.svg?label=version%20for%202.11)](https://maven-badges.herokuapp.com/maven-central/com.github.barambani/http4s-extend_2.11)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.barambani/http4s-extend_2.12.svg?label=version%20for%202.12)](https://maven-badges.herokuapp.com/maven-central/com.github.barambani/http4s-extend_2.12)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.barambani/http4s-extend_2.11.svg?label=central%20repo%202.11&colorB=2282c3)](https://maven-badges.herokuapp.com/maven-central/com.github.barambani/http4s-extend_2.11)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.barambani/http4s-extend_2.12.svg?label=central%20repo%202.12&colorB=2282c3)](https://maven-badges.herokuapp.com/maven-central/com.github.barambani/http4s-extend_2.12)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/barambani/http4s-extend/blob/master/LICENSE)
 
 A basic, still descriptive, example that demonstrates some possible uses for Http4s Extend can be found [here](https://github.com/barambani/http4s-poc-api)
