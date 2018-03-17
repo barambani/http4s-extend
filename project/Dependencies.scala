@@ -32,6 +32,6 @@ object Dependencies {
   )
 
   val compilerPlugins: Seq[ModuleID] = Seq(
-    compilerPlugin("org.spire-math" %% "kind-projector" % versionOf.kindProjector)
+    compilerPlugin("org.spire-math" %% "kind-projector" % versionOf.kindProjector cross CrossVersion.binary)
   )
 }
