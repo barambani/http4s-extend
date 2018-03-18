@@ -8,11 +8,11 @@ trait CirceSyntax {
   implicit def circeDecoderSyntax[A](f: String => A): StringDecodingOps[A] = new StringDecodingOps(f)
 }
 
-final class StringEncodingOps[A](f: A => String) {
+private[syntax] final class StringEncodingOps[A](f: A => String) {
   def encoder: Encoder[A] = encoderFor(f)
 }
 
-final class StringDecodingOps[A](f: String => A) {
+private[syntax] final class StringDecodingOps[A](f: String => A) {
   def decoder: Decoder[A] = decoderFor(f)
   def decoderMap[B](g: A => B): Decoder[B] = decoderMapFor(f)(g)
 }

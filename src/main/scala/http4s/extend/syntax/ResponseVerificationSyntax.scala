@@ -21,7 +21,7 @@ trait ResponseVerificationSyntax {
     new IoResponseResultOps(response)
 }
 
-final class IoResponseResultOps(response: IO[Response[IO]]) {
+private[syntax] final class IoResponseResultOps(response: IO[Response[IO]]) {
 
   import cats.syntax.validated._
   import http4s.extend.syntax.responseVerification._
@@ -59,7 +59,7 @@ final class IoResponseResultOps(response: IO[Response[IO]]) {
     )
 }
 
-final class VerifiedOps[A : Eq : Show](a: A) {
+private[syntax] final class VerifiedOps[A : Eq : Show](a: A) {
 
   def isNotSameAs(expected: =>A): Verified[A] =
     Validated.condNel(a =!= expected, a, s"Unexpected value. Expected different from ${expected.show} but was ${a.show}")
@@ -71,7 +71,7 @@ final class VerifiedOps[A : Eq : Show](a: A) {
     Validated.condNel(p(a), a, s"Unexpected value ${a.show}: Reason $reason")
 }
 
-final class VerifiedOptionOps[A : Eq : Show](a: Option[A]) {
+private[syntax] final class VerifiedOptionOps[A : Eq : Show](a: Option[A]) {
 
   def isNotEmpty: Verified[Option[A]] =
     Validated.condNel(a.isDefined, a, s"Unexpected empty option value")

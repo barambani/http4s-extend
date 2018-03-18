@@ -11,12 +11,12 @@ trait ByNameNtSyntax {
     new ByNameEitherNtOps(fa)
 }
 
-final class ByNameNtOps[F[_], G[_], A](fa: F[A])(implicit nt: F ~~> G) {
+private[syntax] final class ByNameNtOps[F[_], G[_], A](fa: F[A])(implicit nt: F ~~> G) {
   def lift: G[A] = nt(fa)
   def ~~>(): G[A] = lift
 }
 
-final class ByNameEitherNtOps[F[_], G[_], A, E](fa: =>F[Either[E, A]])(implicit nt: F ~~> G) {
+private[syntax] final class ByNameEitherNtOps[F[_], G[_], A, E](fa: =>F[Either[E, A]])(implicit nt: F ~~> G) {
   def liftIntoMonadError(implicit err: MonadError[G, E]): G[A] =
     (err.rethrow[A] _ compose nt.apply)(fa)
 }

@@ -8,7 +8,7 @@ trait Http4sServiceSyntax {
   implicit def httpServiceSyntax[F[_]](s: HttpService[F]): HttpServiceOps[F] = new HttpServiceOps(s)
 }
 
-final class HttpServiceOps[F[_]](service: HttpService[F]) {
+private[syntax] final class HttpServiceOps[F[_]](service: HttpService[F]) {
 
   def runFor(req: Request[F])(implicit F: Functor[F]): F[Response[F]] =
     service.run(req).getOrElse(Response.notFound)
