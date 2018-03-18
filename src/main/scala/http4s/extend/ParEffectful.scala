@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext
   * in parallel. The IO instance is implemented in terms of fs2 async.start. This bit will
   * be simplified a lot when an instance for cats Parallel wil be available to the public
   */
-trait ParEffectful[F[_]] { self =>
+trait ParEffectful[F[_]] {
   def parMap2[A, B, R](fa: =>F[A], fb: =>F[B])(f: (A, B) => R): F[R]
 }
 
