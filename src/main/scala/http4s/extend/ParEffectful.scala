@@ -67,8 +67,8 @@ private[extend] sealed trait ParEffectfulFunctions {
       FE: ParEffectful[F],
       FA: Applicative[F]): F[T[B]] =
     TR.foldM[Id, A, F[T[B]]](ta, FA.pure(TM.empty)) {
-      (ftb, a) => FE.parMap2(f(a), ftb){
-        (fb, tb) => TM.combine(TA.pure(fb), tb)
+      (ftb, a) => FE.parMap2(f(a), ftb) {
+        (b, tb) => TM.combine(TA.pure(b), tb)
       }
     }
 }
