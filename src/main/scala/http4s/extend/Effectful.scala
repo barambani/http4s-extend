@@ -6,7 +6,7 @@ import cats.effect.{Effect, IO}
 import scala.util.Either
 
 /**
-  * suspend, runAsync, and async wrap the equivalent functions in cats.effect.Effect[F]
+  * Separation between the effectful stack and the monad error
   */
 trait Effectful[F[_]] {
 
