@@ -1,5 +1,6 @@
 import Dependencies._
 import ScalacOptions._
+import Templates.ArityFunctionsGenerator
 
 val typelevelOrganization = "org.typelevel"
 val globalOrganization = scalaOrganization in Global
@@ -54,6 +55,9 @@ val releaseSettings: Seq[Def.Setting[_]] = Seq(
 val root = project.in(file("."))
   .settings(crossBuildSettings)
   .settings(releaseSettings)
+  .settings(
+    sourceGenerators in Compile += ((sourceManaged in Compile) map ArityFunctionsGenerator.run(22)).taskValue
+  )
   .settings(
     name                    :=  "http4s-extend",
     organization            :=  "com.github.barambani",
