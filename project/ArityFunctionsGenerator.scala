@@ -25,28 +25,38 @@ object ArityFunctionsGenerator {
     arity => root => templates map {
       t =>
         val file = t.moduleFile(root)
-        IO.write(file, (expand compose t.content)(arity))
+        IO.write(file, t.expandFor(arity))
         file
     }
-
-  private def expand: String => String = identity
 }
 
 private[Templates] trait Template {
   def moduleFile: File => File
-  def content: Int => String
+  def expandFor: Int => String
 }
 
 private[Templates] object ContentHelpers {
 
   import scala.StringContext._
 
-  implicit final class Static(val sc: StringContext) extends AnyVal {
-    def static(args: Any*): String = {
+  implicit final class ContentHelpersDescriptors(val sc: StringContext) extends AnyVal {
+
+    def static(args: String*): String =
+      trimLines(args) mkString "\n"
+
+    def repeat(args: String*)(arity: Int, skip: Int = 0): String = {
+
+      trimLines(args) mkString "\n"
+    }
+
+    private def trimLines(args: Seq[String]): Array[String] = {
+
       val interpolated = sc.standardInterpolator(treatEscapes, args)
       val rawLines = interpolated split '\n'
-      val trimmedLines = rawLines map { _ dropWhile (_.isWhitespace) }
-      trimmedLines mkString "\n"
+
+      rawLines map {
+        _ dropWhile (_.isWhitespace)
+      }
     }
   }
 }

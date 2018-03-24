@@ -48,11 +48,8 @@ private[extend] sealed trait ParEffectfulFunctions {
   def parMap4[F[_] : ParEffectful, A1, A2, A3, A4, R](fa1: =>F[A1], fa2: =>F[A2], fa3: =>F[A3], fa4: =>F[A4])(f: (A1, A2, A3, A4) => R): F[R] =
     ParEffectful.parMap2(fa1, ParEffectful.parTupled2(fa2, ParEffectful.parTupled2(fa3, fa4))) { case (a1, (a2, (a3, a4))) => f(a1, a2, a3, a4) }
 
-  def parMap41[F[_] : ParEffectful, A, B, C, D, R](fa: =>F[A], fb: =>F[B], fc: =>F[C], fd: =>F[D])(f: (A, B, C, D) => R): F[R] =
-    parMap3(fa, fb, ParEffectful.parTupled2(fc, fd)) { case (a, b, (c, d)) => f(a, b, c, d) }
-
-  def parTupled4[F[_] : ParEffectful, A, B, C, D](fa: =>F[A], fb: =>F[B], fc: =>F[C], fd: =>F[D]): F[(A, B, C, D)] =
-    parMap4(fa, fb, fc, fd)(Tuple4.apply)
+  def parTupled4[F[_] : ParEffectful, A1, A2, A3, A4](fa1: =>F[A1], fa2: =>F[A2], fa3: =>F[A3], fa4: =>F[A4]): F[(A1, A2, A3, A4)] =
+    parMap4(fa1, fa2, fa3, fa4)(Tuple4.apply)
 
   /**
     * Traverse derived from ParEffectful parMap2. If used with IO in F[_] position it will
