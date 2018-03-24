@@ -12,7 +12,7 @@ import org.http4s.{EntityDecoder, Response, Status}
 
 import scala.util.Right
 
-trait ResponseVerificationSyntax {
+private[syntax] trait ResponseVerificationSyntax {
 
   implicit def verifiedSyntax[A : Eq : Show](a: A) = new VerifiedOps(a)
   implicit def verifiedOptionSyntax[A : Eq : Show](a: Option[A]) = new VerifiedOptionOps(a)

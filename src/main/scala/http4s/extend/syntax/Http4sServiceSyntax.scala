@@ -4,7 +4,7 @@ import cats.syntax.flatMap._
 import cats.{FlatMap, Functor}
 import org.http4s.{HttpService, Request, Response}
 
-trait Http4sServiceSyntax {
+private[syntax] trait Http4sServiceSyntax {
   implicit def httpServiceSyntax[F[_]](s: HttpService[F]): HttpServiceOps[F] = new HttpServiceOps(s)
 }
 
