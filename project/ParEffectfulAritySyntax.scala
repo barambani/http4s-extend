@@ -7,7 +7,7 @@ private[Templates] object ParEffectfulAritySyntax extends Template {
   def moduleFile: File => File =
     _ / "syntax" / "ParEffectfulAritySyntax.scala"
 
-  def content: Int => String =
+  def expandFor: Int => String =
     arity => {
 
       val top =
