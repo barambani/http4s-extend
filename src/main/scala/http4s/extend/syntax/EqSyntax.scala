@@ -2,7 +2,7 @@ package http4s.extend.syntax
 
 import cats.Eq
 
-trait EqSyntax {
+private[syntax] trait EqSyntax {
   implicit def eqSyntax(t: => Throwable)(implicit te: Eq[Throwable]) = new ThrowableEqOps(t)
 }
 
