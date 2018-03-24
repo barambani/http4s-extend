@@ -8,9 +8,8 @@ import cats.syntax.either._
 import scala.concurrent.ExecutionContext
 
 /**
-  * parMap2 and parMap3, parTupled2 and parTupled3 describe the parallel execution of F[_]
-  * in parallel. The IO instance is implemented in terms of fs2 async.start. This bit will
-  * be simplified a lot when an instance for cats Parallel wil be available to the public
+  * ParEffectful describes the execution of F[_] in parallel.
+  * The IO instance is implemented in terms of fs2 async.start
   */
 trait ParEffectful[F[_]] {
   def parMap2[A, B, R](fa: =>F[A], fb: =>F[B])(f: (A, B) => R): F[R]
@@ -18,7 +17,7 @@ trait ParEffectful[F[_]] {
 
 private[extend] sealed trait ParEffectfulInstances {
 
-  implicit def ioEffectfulOp(implicit ev2: Semigroup[Throwable], ec: ExecutionContext): ParEffectful[IO] =
+  implicit def ioEffectfulOp(implicit ev: Semigroup[Throwable], ec: ExecutionContext): ParEffectful[IO] =
     new ParEffectful[IO] {
 
       val evidence = Effect[IO]
@@ -29,7 +28,7 @@ private[extend] sealed trait ParEffectfulInstances {
             evidence.rethrow(
               (ioa.attempt, iob.attempt) mapN {
                 case (Right(a), Right(b)) => f(a, b).asRight
-                case (Left(ea), Left(eb)) => ev2.combine(ea, eb).asLeft
+                case (Left(ea), Left(eb)) => ev.combine(ea, eb).asLeft
                 case (Left(ea), _)        => ea.asLeft
                 case (_, Left(eb))        => eb.asLeft
               }
@@ -40,17 +39,20 @@ private[extend] sealed trait ParEffectfulInstances {
 
 private[extend] sealed trait ParEffectfulFunctions {
 
-  def parMap2[F[_], A, B, R](fa: =>F[A], fb: =>F[B])(f: (A, B) => R)(implicit ev: ParEffectful[F]): F[R] =
-    ev.parMap2(fa, fb)(f)
+  def parMap3[F[_] : ParEffectful, A, B, C, R](fa: =>F[A], fb: =>F[B], fc: =>F[C])(f: (A, B, C) => R): F[R] =
+    ParEffectful.parMap2(fa, ParEffectful.parTupled2(fb, fc)) { case (a, (b, c)) => f(a, b, c) }
 
-  def parTupled2[F[_], A, B](fa: =>F[A], fb: =>F[B])(implicit ev: ParEffectful[F]): F[(A, B)] =
-    ev.parMap2(fa, fb)(Tuple2.apply)
-
-  def parMap3[F[_], A, B, C, R](fa: =>F[A], fb: =>F[B], fc: =>F[C])(f: (A, B, C) => R)(implicit ev: ParEffectful[F]): F[R] =
-    ev.parMap2(fa, parMap2(fb, fc)(Tuple2.apply))((a, bc) => f(a, bc._1, bc._2))
-
-  def parTupled3[F[_], A, B, C](fa: =>F[A], fb: =>F[B], fc: =>F[C])(implicit ev: ParEffectful[F]): F[(A, B, C)] =
+  def parTupled3[F[_] : ParEffectful, A, B, C](fa: =>F[A], fb: =>F[B], fc: =>F[C]): F[(A, B, C)] =
     parMap3(fa, fb, fc)(Tuple3.apply)
+
+  def parMap4[F[_] : ParEffectful, A1, A2, A3, A4, R](fa1: =>F[A1], fa2: =>F[A2], fa3: =>F[A3], fa4: =>F[A4])(f: (A1, A2, A3, A4) => R): F[R] =
+    ParEffectful.parMap2(fa1, ParEffectful.parTupled2(fa2, ParEffectful.parTupled2(fa3, fa4))) { case (a1, (a2, (a3, a4))) => f(a1, a2, a3, a4) }
+
+  def parMap41[F[_] : ParEffectful, A, B, C, D, R](fa: =>F[A], fb: =>F[B], fc: =>F[C], fd: =>F[D])(f: (A, B, C, D) => R): F[R] =
+    parMap3(fa, fb, ParEffectful.parTupled2(fc, fd)) { case (a, b, (c, d)) => f(a, b, c, d) }
+
+  def parTupled4[F[_] : ParEffectful, A, B, C, D](fa: =>F[A], fb: =>F[B], fc: =>F[C], fd: =>F[D]): F[(A, B, C, D)] =
+    parMap4(fa, fb, fc, fd)(Tuple4.apply)
 
   /**
     * Traverse derived from ParEffectful parMap2. If used with IO in F[_] position it will
@@ -73,6 +75,6 @@ private[extend] sealed trait ParEffectfulFunctions {
     }
 }
 
-object ParEffectful extends ParEffectfulInstances with ParEffectfulFunctions {
+object ParEffectful extends ParEffectfulInstances with ParEffectfulFunctions with ParEffectfulArityFunctions {
   @inline def apply[F[_]](implicit F: ParEffectful[F]): ParEffectful[F] = F
 }
