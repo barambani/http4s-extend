@@ -1,7 +1,7 @@
 package Templates
 
 import sbt._
-import ContentHelpers._
+import BlockSyntax._
 
 private[Templates] object ParEffectfulArityFunctions extends Template {
 
@@ -22,11 +22,14 @@ private[Templates] object ParEffectfulArityFunctions extends Template {
           |  def parTupled2[F[_], A1, A2](fa1: =>F[A1], fa2: =>F[A2])(implicit ev: ParEffectful[F]): F[(A1, A2)] =
           |    ev.parMap2(fa1, fa2)(Tuple2.apply)"""
 
-      def repeatedBlock: Int => String =
+      def arityBlock: Int => String =
         arity => {
 
           val expansion = BlockExpansions(arity)
           import expansion._
+
+          lazy val `(a0..(a1..(an-2, an-1)` =
+            rightAssociativeExpansionOf(`sym a0..an-1`)("")
 
           lazy val `(a0..ParEffectful.parTupled2(a1..ParEffectful.parTupled2(an-2, an-1)` =
             rightAssociativeExpansionOf(`sym fa0..fan-1`)("ParEffectful.parTupled2")
@@ -39,12 +42,10 @@ private[Templates] object ParEffectfulArityFunctions extends Template {
              |    parMap${arity.toString}(${`fa0..fan-1`})(Tuple$arityS.apply)""".stripMargin
         }
 
-      val dynamic = repeatedBlock.expandTo(maxArity, 2)
-
       val bottom = static"""}"""
 
       s"""$top
-         |$dynamic
+         |${arityBlock.expandedTo(maxArity, skip = 2)}
          |$bottom""".stripMargin
     }
 }
