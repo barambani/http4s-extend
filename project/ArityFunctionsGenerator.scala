@@ -50,7 +50,8 @@ private[Templates] final case class BlockExpansions(private val upToArity: Int) 
   lazy val `fa0..fan-1`     = `sym fa0..fan-1` mkString ", "
   lazy val `F[A0]..F[An-1]` = `sym F[A0]..F[An-1]` mkString ", "
 
-  lazy val `fa0: =>F[A0]..fan-1: =>F[An-1]` = `sym fa0..fan-1` zip `sym F[A0]..F[An-1]` map { case (fa, f) => s"$fa: =>$f" } mkString ", "
+  lazy val `fa0: =>F[A0]..fan-1: =>F[An-1]` =
+    `sym fa0..fan-1` zip `sym F[A0]..F[An-1]` map { case (fa, f) => s"$fa: =>$f" } mkString ", "
 
   def rightAssociativeExpansionOf: Seq[String] => String => String =
     symbols => prefix =>
