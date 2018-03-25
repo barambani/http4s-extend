@@ -17,7 +17,7 @@ object ArityFunctionsGenerator {
 
   /**
     * Function to generate the files. It also writes them to disk
-    * as side effect
+    * as a side effect
     *
     * @return a sequence of generated files
     */
@@ -37,19 +37,20 @@ private[Templates] trait Template {
 
 private[Templates] final case class BlockExpansions(private val upToArity: Int) {
 
+  lazy val arityS = upToArity.toString
+
   lazy val `sym A0..An-1`       = arityRange map (n => s"A$n")
   lazy val `sym fa0..fan-1`     = arityRange map (n => s"fa$n")
   lazy val `sym a0..an-1`       = arityRange map (n => s"a$n")
   lazy val `sym F[A0]..F[An-1]` = arityRange map (n => s"F[A$n]")
+  lazy val `sym _1.._n`         = arityRange map (n => s"_${n + 1}")
 
-  lazy val arityS = upToArity.toString
-
-  lazy val `A0..An-1`   = `sym A0..An-1` mkString ", "
-  lazy val `a0..an-1`   = `sym a0..an-1` mkString ", "
-  lazy val `fa0..fan-1` = `sym fa0..fan-1` mkString ", "
+  lazy val `A0..An-1`       = `sym A0..An-1` mkString ", "
+  lazy val `a0..an-1`       = `sym a0..an-1` mkString ", "
+  lazy val `fa0..fan-1`     = `sym fa0..fan-1` mkString ", "
+  lazy val `F[A0]..F[An-1]` = `sym F[A0]..F[An-1]` mkString ", "
 
   lazy val `fa0: =>F[A0]..fan-1: =>F[An-1]` = `sym fa0..fan-1` zip `sym F[A0]..F[An-1]` map { case (fa, f) => s"$fa: =>$f" } mkString ", "
-  lazy val `(a0..(a1..(an-2, an-1)`         = rightAssociativeExpansionOf(`sym a0..an-1`)("")
 
   def rightAssociativeExpansionOf: Seq[String] => String => String =
     symbols => prefix =>
@@ -59,11 +60,11 @@ private[Templates] final case class BlockExpansions(private val upToArity: Int) 
   private def arityRange: Range = 0 until upToArity
 }
 
-private[Templates] object ContentHelpers {
+private[Templates] object BlockSyntax {
 
   import scala.StringContext._
 
-  implicit final class StringHelpers(val sc: StringContext) extends AnyVal {
+  implicit final class BlockOps(val sc: StringContext) extends AnyVal {
 
     def static(args: String*): String =
       trimLines(args) mkString "\n"
@@ -79,8 +80,8 @@ private[Templates] object ContentHelpers {
     }
   }
 
-  implicit final class FunctionHelpers(val f: Int => String) extends AnyVal {
-    def expandTo(maxArity: Int, skip: Int): String =
+  implicit final class BlockExpansionOps(val f: Int => String) extends AnyVal {
+    def expandedTo(maxArity: Int, skip: Int): String =
       (1 + skip to maxArity) map f mkString "\n"
   }
 }

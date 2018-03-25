@@ -1,7 +1,7 @@
 package Templates
 
+import Templates.BlockSyntax._
 import sbt._
-import ContentHelpers._
 
 private[Templates] object ParEffectfulAritySyntax extends Template {
   def moduleFile: File => File =
@@ -10,15 +10,43 @@ private[Templates] object ParEffectfulAritySyntax extends Template {
   def expandTo: Int => String =
     maxArity => {
 
-      val top =
+      val syntaxTraitTop =
         static"""package http4s.extend.syntax
           |
-          |private[syntax] trait ParEffectfulAritySyntax {
-          |"""
+          |import http4s.extend.ParEffectful
+          |
+          |private[syntax] trait ParEffectfulAritySyntax {"""
 
-      val bottom = static"""}"""
+      def syntaxArityBlock: Int => String =
+        arity => {
 
-      s"""$top
-         |$bottom""".stripMargin
+          val expansion = BlockExpansions(arity)
+          import expansion._
+
+          static"""|  implicit def parEffectfulSyntax$arityS[F[_] : ParEffectful, ${`A0..An-1`}](t$arityS: (${`F[A0]..F[An-1]`})) = new Tuple${arityS}ParEffectfulOps(t$arityS)""".stripMargin
+        }
+
+      val syntaxTraitTopBottom = static"""}"""
+
+      def opsArityBlock: Int => String =
+        arity => {
+
+          val expansion = BlockExpansions(arity)
+          import expansion._
+
+          lazy val `t._1..t._n` =
+            List.fill(arity)(s"t$arityS") zip `sym _1.._n` map { case (t, n) => s"$t.$n" } mkString ", "
+
+          static"""
+            |private[syntax] final class Tuple${arityS}ParEffectfulOps[F[_] : ParEffectful, ${`A0..An-1`}](t$arityS: (${`F[A0]..F[An-1]`})) {
+            |  def parMap[R](f: (${`A0..An-1`}) => R): F[R] = ParEffectful.parMap$arityS(${`t._1..t._n`})(f)
+            |  def parTupled: F[(${`A0..An-1`})] = ParEffectful.parTupled$arityS(${`t._1..t._n`})
+            |}""".stripMargin
+        }
+
+      s"""$syntaxTraitTop
+         |${syntaxArityBlock.expandedTo(maxArity, skip = 1)}
+         |$syntaxTraitTopBottom
+         |${opsArityBlock.expandedTo(maxArity, skip = 1)}""".stripMargin
     }
 }
