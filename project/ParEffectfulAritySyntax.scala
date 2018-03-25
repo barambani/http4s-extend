@@ -7,8 +7,8 @@ private[Templates] object ParEffectfulAritySyntax extends Template {
   def moduleFile: File => File =
     _ / "syntax" / "ParEffectfulAritySyntax.scala"
 
-  def expandFor: Int => String =
-    arity => {
+  def expandTo: Int => String =
+    maxArity => {
 
       val top =
         static"""package http4s.extend.syntax
