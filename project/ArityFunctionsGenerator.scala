@@ -7,7 +7,6 @@ import sbt._
   *
   * https://github.com/typelevel/cats/blob/master/project/Boilerplate.scala
  */
-
 object ArityFunctionsGenerator {
 
   private val templates: Seq[Template] = Seq(
