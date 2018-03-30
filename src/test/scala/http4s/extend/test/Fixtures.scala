@@ -1,15 +1,18 @@
 package http4s.extend.test
 
 import cats.Eq
+import cats.effect.laws.util.TestInstances
+import cats.tests.TestSettings
 import http4s.extend.ExceptionDisplay
 import http4s.extend.instances.eq._
 import org.scalacheck.{Arbitrary, Cogen}
+import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.typelevel.discipline.scalatest.Discipline
 
-trait Fixtures
+private[test] object Fixtures {
 
-object Fixtures {
-
-  case class TestError(error: ExceptionDisplay)
+  final case class TestError(error: ExceptionDisplay)
 
   object TestError {
 
@@ -22,4 +25,12 @@ object Fixtures {
     implicit def testErrorEq: Eq[TestError] =
       Eq.by[TestError, ExceptionDisplay](_.error)
   }
+
+  abstract class MinimalSuite
+    extends FunSuite
+    with    Matchers
+    with    GeneratorDrivenPropertyChecks
+    with    Discipline
+    with    TestSettings
+    with    TestInstances
 }
