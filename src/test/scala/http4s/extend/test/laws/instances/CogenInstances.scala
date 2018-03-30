@@ -7,7 +7,7 @@ import org.scalacheck.rng.Seed
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-trait CogenInstances {
+private[test] trait CogenInstances {
 
   implicit def futureCogen[A : Cogen]: Cogen[Future[A]] =
     Cogen[Future[A]] { (seed: Seed, t: Future[A]) => Cogen[A].perturb(seed, Await.result(t, 1.second)) }

@@ -9,7 +9,7 @@ import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Cogen, Prop}
 import org.typelevel.discipline.Laws
 
-sealed trait EffectfulLawsChecks[F[_]] extends Laws {
+private[test] sealed trait EffectfulLawsChecks[F[_]] extends Laws {
 
   def laws: EffectfulLaws[F]
 

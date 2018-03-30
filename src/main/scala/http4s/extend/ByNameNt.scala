@@ -4,7 +4,6 @@ import cats.Eval
 import cats.Eval.always
 import cats.arrow.FunctionK
 import cats.effect.IO
-import cats.syntax.either._
 import monix.eval.{Task => MonixTask}
 import monix.execution.Scheduler
 import scalaz.concurrent.{Task => ScalazTask}
@@ -19,7 +18,7 @@ sealed trait ByNameNt[F[_], G[_]] {
     λ[FunctionK[F, G]](apply(_))
 }
 
-sealed trait ByNameNtInstances {
+private[extend] sealed trait ByNameNtInstances {
 
   implicit def futureToIo: ByNameNt[Future, IO] =
     new ByNameNt[Future, IO] {
@@ -36,8 +35,8 @@ sealed trait ByNameNtInstances {
     new ByNameNt[ScalazTask, IO] {
       def apply[A](fa: =>ScalazTask[A]): IO[A] =
         Eval.always(
-          Either.catchNonFatal(fa.unsafePerformSync).fold(
-            e => IO.raiseError[A](e),
+          fa.unsafePerformSyncAttempt.fold(
+            e => IO.raiseError(e),
             a => IO.pure(a)
           )
         ).value

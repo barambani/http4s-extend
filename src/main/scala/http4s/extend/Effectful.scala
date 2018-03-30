@@ -24,7 +24,7 @@ trait Effectful[F[_]] {
 
 sealed trait EffectfulInstances {
 
-  implicit def ioEffectfulOp: Effectful[IO] =
+  implicit val ioEffectfulOp: Effectful[IO] =
     new Effectful[IO] {
 
       val monadError = Effect[IO]

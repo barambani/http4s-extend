@@ -2,13 +2,21 @@ package http4s.extend.test
 
 import cats.effect.IO
 import cats.effect.laws.discipline.arbitrary._
+import cats.effect.laws.util.TestContext
+import cats.instances.double._
+import cats.instances.either._
+import cats.instances.int._
+import cats.instances.string._
+import cats.instances.tuple._
+import cats.instances.unit._
 import cats.laws.discipline.MonadErrorTests
-import cats.tests.CatsSuite
-import http4s.extend.instances.EqInstances
+import http4s.extend.test.Fixtures.MinimalSuite
 import http4s.extend.test.laws.checks.EffectfulLawsChecks
 import org.scalacheck.Arbitrary.arbDouble
 
-final class EffectfulDiscipline extends CatsSuite with EqInstances {
+final class EffectfulDiscipline extends MinimalSuite {
+
+  implicit val C = TestContext()
 
   checkAll(
     "MonadErrorTests[IO, Throwable]",

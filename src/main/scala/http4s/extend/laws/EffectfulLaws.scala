@@ -8,11 +8,8 @@ import http4s.extend.Effectful
 /**
   * Effectful, together with its MonadError evidence, should abide by the same laws as cats.effect.Effect
   * 
-  * The code below is copied from Cats Effect:
+  * The code below is taken and adapted from the Cats Effect Laws:
   * https://github.com/typelevel/cats-effect/tree/master/laws/shared/src/main/scala/cats/effect/laws
-  *
-  * It will not be needed anymore like the Effectful type class when it will be possible to use Effect
-  * with other monads in the Mtl style without incurring in conflicting implicits
   */
 sealed trait EffectfulLaws[F[_]] {
 
