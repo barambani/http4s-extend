@@ -33,5 +33,4 @@ object ThrowableModule {
 
       loop(Option(th), Vector.empty)
     }
-
 }
