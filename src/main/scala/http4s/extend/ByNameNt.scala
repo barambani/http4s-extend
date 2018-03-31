@@ -16,7 +16,7 @@ sealed trait ByNameNt[F[_], G[_]] {
   implicit def evF: Functor[F]
   implicit def evG: Functor[G]
 
-  def apply[A](fa: => F[A]): G[A]
+  def apply[A]: (=>F[A]) => G[A]
 
   def functionK: FunctionK[F, G] =
     λ[FunctionK[F, G]](apply(_))
@@ -29,8 +29,8 @@ private[extend] sealed trait ByNameNtInstances {
       val evF = Functor[Future]
       val evG = Functor[IO]
 
-      def apply[A](fa: =>Future[A]): IO[A] =
-        IO.fromFuture(IO.eval(always(fa)))
+      def apply[A]: (=>Future[A]) => IO[A] =
+        IO.fromFuture[A] _ compose IO.eval[Future[A]] compose always
     }
 
   implicit def monixTaskToIo(implicit s: Scheduler): ByNameNt[MonixTask, IO] =
@@ -38,7 +38,7 @@ private[extend] sealed trait ByNameNtInstances {
       val evF = Functor[MonixTask]
       val evG = Functor[IO]
 
-      def apply[A](fa: =>MonixTask[A]): IO[A] = fa.toIO
+      def apply[A]: (=>MonixTask[A]) => IO[A] = _.toIO
     }
 
   implicit val scalazTaskToIo: ByNameNt[ScalazTask, IO] =
@@ -48,8 +48,8 @@ private[extend] sealed trait ByNameNtInstances {
       }
       val evG = Functor[IO]
 
-      def apply[A](fa: =>ScalazTask[A]): IO[A] =
-        Eval.always(
+      def apply[A]: (=>ScalazTask[A]) => IO[A] =
+        fa => Eval.always(
           fa.unsafePerformSyncAttempt.fold(
             e => IO.raiseError(e),
             a => IO.pure(a)
