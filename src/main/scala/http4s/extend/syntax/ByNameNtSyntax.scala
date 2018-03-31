@@ -12,7 +12,7 @@ private[syntax] trait ByNameNtSyntax {
 }
 
 private[syntax] final class ByNameNtOps[F[_], G[_], A](fa: F[A])(implicit nt: F ~~> G) {
-  def transform: G[A] = nt(fa)
+  def transform: G[A] = nt.apply(fa)
   def ~~>(): G[A] = transform
 }
 
