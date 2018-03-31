@@ -19,7 +19,7 @@ final class EffectfulDiscipline extends MinimalSuite {
   implicit val C = TestContext()
 
   checkAll(
-    "MonadErrorTests[IO, Throwable]",
+    "MonadError[IO, Throwable]",
     MonadErrorTests[IO, Throwable].monadError[String, Int, Double]
   )
 

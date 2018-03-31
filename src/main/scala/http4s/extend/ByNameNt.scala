@@ -11,11 +11,19 @@ import scalaz.concurrent.{Task => ScalazTask}
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+  * Models a natural transformation between the Functors `F[_]` and `G[_]`.
+  *
+  * It satisfies the naturality condition as proved by ByNameNtLaws
+  */
 sealed trait ByNameNt[F[_], G[_]] {
 
   implicit def evF: Functor[F]
   implicit def evG: Functor[G]
 
+  /**
+    * Gives the Natural Transformation from `F` to `G` for all the types `A` where `F` is called by name
+    */
   def apply[A]: (=>F[A]) => G[A]
 
   def functionK: FunctionK[F, G] =
@@ -41,11 +49,9 @@ private[extend] sealed trait ByNameNtInstances {
       def apply[A]: (=>MonixTask[A]) => IO[A] = _.toIO
     }
 
-  implicit val scalazTaskToIo: ByNameNt[ScalazTask, IO] =
+  implicit def scalazTaskToIo(implicit ev: Functor[ScalazTask]): ByNameNt[ScalazTask, IO] =
     new ByNameNt[ScalazTask, IO] {
-      val evF = new Functor[ScalazTask] {
-        def map[A, B](fa: ScalazTask[A])(f: A => B): ScalazTask[B] = fa map f
-      }
+      val evF = ev
       val evG = Functor[IO]
 
       def apply[A]: (=>ScalazTask[A]) => IO[A] =
