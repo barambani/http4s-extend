@@ -25,7 +25,7 @@ private[Templates] object ParEffectfulArityFunctions extends Template {
       def arityBlock: Int => String =
         arity => {
 
-          val expansion = BlockExpansions(arity)
+          val expansion = BlockMembersExpansions(arity)
           import expansion._
 
           lazy val `(a0..(a1..(an-2, an-1)` =

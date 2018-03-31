@@ -34,7 +34,7 @@ private[Templates] trait Template {
   def expandTo: Int => String
 }
 
-private[Templates] final case class BlockExpansions(private val upToArity: Int) {
+private[Templates] final case class BlockMembersExpansions(private val upToArity: Int) {
 
   lazy val arityS = upToArity.toString
 
@@ -68,7 +68,7 @@ private[Templates] object BlockSyntax {
 
     def static(args: String*): String =
       trimLines(args) mkString "\n"
-
+    
     private def trimLines(args: Seq[String]): Array[String] = {
 
       val interpolated = sc.standardInterpolator(treatEscapes, args)

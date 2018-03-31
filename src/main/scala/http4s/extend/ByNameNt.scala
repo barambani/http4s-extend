@@ -20,7 +20,7 @@ sealed trait ByNameNt[F[_], G[_]] {
 
 private[extend] sealed trait ByNameNtInstances {
 
-  implicit def futureToIo: ByNameNt[Future, IO] =
+  implicit val futureToIo: ByNameNt[Future, IO] =
     new ByNameNt[Future, IO] {
       def apply[A](fa: =>Future[A]): IO[A] =
         IO.fromFuture(IO.eval(always(fa)))
@@ -31,7 +31,7 @@ private[extend] sealed trait ByNameNtInstances {
       def apply[A](fa: =>MonixTask[A]): IO[A] = fa.toIO
     }
 
-  implicit def scalazTaskToIo: ByNameNt[ScalazTask, IO] =
+  implicit val scalazTaskToIo: ByNameNt[ScalazTask, IO] =
     new ByNameNt[ScalazTask, IO] {
       def apply[A](fa: =>ScalazTask[A]): IO[A] =
         Eval.always(

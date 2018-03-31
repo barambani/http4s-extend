@@ -20,18 +20,18 @@ private[Templates] object ParEffectfulAritySyntax extends Template {
       def syntaxArityBlock: Int => String =
         arity => {
 
-          val expansion = BlockExpansions(arity)
+          val expansion = BlockMembersExpansions(arity)
           import expansion._
 
           static"""|  implicit def parEffectfulSyntax$arityS[F[_] : ParEffectful, ${`A0..An-1`}](t$arityS: (${`F[A0]..F[An-1]`})) = new Tuple${arityS}ParEffectfulOps(t$arityS)""".stripMargin
         }
 
-      val syntaxTraitTopBottom = static"""}"""
+      val syntaxTraitBottom = static"""}"""
 
       def opsArityBlock: Int => String =
         arity => {
 
-          val expansion = BlockExpansions(arity)
+          val expansion = BlockMembersExpansions(arity)
           import expansion._
 
           lazy val `t._1..t._n` =
@@ -46,7 +46,7 @@ private[Templates] object ParEffectfulAritySyntax extends Template {
 
       s"""$syntaxTraitTop
          |${syntaxArityBlock.expandedTo(maxArity, skip = 1)}
-         |$syntaxTraitTopBottom
+         |$syntaxTraitBottom
          |${opsArityBlock.expandedTo(maxArity, skip = 1)}""".stripMargin
     }
 }

@@ -24,7 +24,7 @@ final class EffectfulDiscipline extends MinimalSuite {
   )
 
   checkAll(
-    "EffectfulLawsChecks[IO]",
+    "Effectful[IO]",
     EffectfulLawsChecks[IO].effectful[Double]
   )
 }
