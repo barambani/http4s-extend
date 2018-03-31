@@ -12,6 +12,10 @@ sealed trait ByNameNtLaws[F[_], G[_]] {
   implicit def evG: Functor[G]
   implicit def nt: ByNameNt[F, G]
 
+  /**
+    * This law is automatically satisfied as a consequence of Parametricity.
+    * Here is implemented as an exercise
+    */
   def naturalityCondition[A, B](fa: F[A], f: A => B) =
     nt.apply(fa map f) <-> (nt.apply(fa) map f)
 }

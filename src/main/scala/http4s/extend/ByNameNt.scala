@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * Models a natural transformation between the Functors `F[_]` and `G[_]`.
   *
-  * It satisfies the naturality condition as proved by ByNameNtLaws
+  * It satisfies the naturality condition. See ByNameNtLaws
   */
 sealed trait ByNameNt[F[_], G[_]] {
 
