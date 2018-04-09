@@ -8,6 +8,6 @@ object MkExceptionDisplay extends NewType {
   def unMk(t: T): String = t.asInstanceOf[String]
   def mkF[F[_]](fs: F[String]): F[T] = fs.asInstanceOf[F[T]]
 
-  implicit val throwableCompleteMessageEq: Eq[ExceptionDisplay] =
+  implicit val exceptionDisplayEq: Eq[ExceptionDisplay] =
     Eq.by[ExceptionDisplay, String](unMk)
 }
