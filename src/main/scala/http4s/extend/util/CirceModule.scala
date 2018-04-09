@@ -8,7 +8,20 @@ object CirceModule {
 
   /**
     * Gives a Circe Encoder for the type `A` when a `Show` instance
-    * is available for it
+    * is available for it.
+    *
+    * Example, Instant:
+    *
+    * val instantEncoder: Encoder[Instant] = encoderFor[Instant]
+    *
+    *
+    * Example, Shapeless tag:
+    *
+    * def taggedLongEncoder[T]: Encoder[Long @@ T] = encoderFor[Long @@ T]
+    *
+    * def taggedStringEncoder[T]: Encoder[String @@ T] = encoderFor[String @@ T]
+    *
+    * def taggedBigDecimalEncoder[T]: Encoder[BigDecimal @@ T] = encoderFor[BigDecimal @@ T]
     *
     * @return An encoder for `A`
     */
@@ -19,6 +32,10 @@ object CirceModule {
     * Gives a Circe Decoder for the type `A` when a way to go from String to `A`
     * is provided
     *
+    * Example, Instant:
+    *
+    * val instantDecoder: Decoder[Instant] = decoderFor(Instant.parse)
+    *
     * @return A decoder for `A`
     */
   def decoderFor[A]: (String => A) => Decoder[A] =
@@ -26,6 +43,17 @@ object CirceModule {
 
   /**
     * Gives a Circe Decoder for `A` that maps the successful decoded value with `f`
+    *
+    * Example, Shapeless tag:
+    *
+    * def taggedLongDecoder[T]: Decoder[Long @@ T] =
+    *   mappedDecoderFor(_.toLong)(tag[T].apply)
+    *
+    * def taggedBigDecimalDecoder[T]: Decoder[BigDecimal @@ T] =
+    *   mappedDecoderFor(BigDecimal.apply)(tag[T].apply)
+    *
+    * def taggedStringDecoder[T]: Decoder[String @@ T] =
+    *   mappedDecoderFor(identity)(tag[T].apply)
     *
     * @return A decoder for `A` that maps the result to `B` in case of successful decoding
     */
