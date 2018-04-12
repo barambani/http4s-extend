@@ -1,45 +1,60 @@
 package http4s.extend
 
-import cats.MonadError
-import cats.effect.{Effect, IO}
+import cats.effect.IO
 
 import scala.util.Either
 
 /**
   * Separation between the effectful stack and the monad error
   */
-trait Effectful[F[_]] {
+trait Effectful[E, F[_]] {
 
-  val monadError: MonadError[F, Throwable]
+  def unit: F[Unit]
 
-  def suspend[A](t: => F[A]): F[A]
+  def pure[A]: A => F[A]
 
-  def runAsync[A](fa: F[A])(cb: Either[Throwable, A] => IO[Unit]): IO[Unit]
+  def delay[A]: (=>A) => F[A]
 
-  def async[A](k: (Either[Throwable, A] => Unit) => Unit): F[A]
+  def fail[A]: E => F[A]
 
-  def delay[A](t: => A): F[A] =
-    suspend(monadError.pure(t))
+  def suspend[A]: (=>F[A]) => F[A]
+
+  def attempt[A]: F[A] => F[Either[E, A]]
+
+  def absolve[A]: F[Either[E, A]] => F[A]
+
+  def async[A]: ((Either[E, A] => Unit) => Unit) => F[A]
+
+  def runAsync[A]: F[A] => (Either[E, A] => F[Unit]) => F[Unit]
 }
 
 sealed trait EffectfulInstances {
 
-  implicit val ioEffectfulOp: Effectful[IO] =
-    new Effectful[IO] {
+  implicit val ioEffectfulOp: Effectful[Throwable, IO] =
+    new Effectful[Throwable, IO] {
 
-      val monadError = Effect[IO]
+      def unit: IO[Unit] = IO.unit
 
-      def runAsync[A](fa: IO[A])(cb: Either[Throwable, A] => IO[Unit]): IO[Unit] =
-        monadError.runAsync(fa)(cb)
+      def pure[A]: A => IO[A] = IO.pure
 
-      def suspend[A](t: => IO[A]): IO[A] =
-        monadError.suspend(t)
+      def delay[A]: (=>A) => IO[A] = IO.apply
 
-      def async[A](k: (Either[Throwable, A] => Unit) => Unit): IO[A] =
-        monadError.async(k)
+      def fail[A]: Throwable => IO[A] = IO.raiseError
+
+      def suspend[A]: (=>IO[A]) => IO[A] = IO.suspend
+
+      def attempt[A]: IO[A] => IO[Either[Throwable, A]] = _.attempt
+
+      def absolve[A]: IO[Either[Throwable, A]] => IO[A] =
+        _ flatMap { _.fold(IO.raiseError, IO.pure) }
+
+      def async[A]: ((Either[Throwable, A] => Unit) => Unit) => IO[A] = IO.async
+
+      def runAsync[A]: IO[A] => (Either[Throwable, A] => IO[Unit]) => IO[Unit] =
+        fa => cb => fa runAsync cb
     }
 }
 
 object Effectful extends EffectfulInstances {
-  @inline def apply[F[_]](implicit F: Effectful[F]): Effectful[F] = F
+  @inline def apply[E, F[_]](implicit F: Effectful[E, F]): Effectful[E, F] = F
 }
