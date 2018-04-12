@@ -1,9 +1,11 @@
 package http4s.extend.laws
 
+import cats.MonadError
 import cats.effect.IO
 import cats.laws._
 import cats.syntax.apply._
 import http4s.extend.Effectful
+import cats.syntax.either._
 
 /**
   * Effectful, together with its MonadError evidence, should abide by the same laws as cats.effect.Effect
@@ -11,48 +13,48 @@ import http4s.extend.Effectful
   * The code below is adapted from the Cats Effect Laws:
   * https://github.com/typelevel/cats-effect/tree/master/laws/shared/src/main/scala/cats/effect/laws
   */
-sealed trait EffectfulLaws[F[_]] {
+sealed trait EffectfulLaws[E, F[_]] {
 
-  implicit def ev: Effectful[F]
-  implicit def monadError = ev.monadError
+  implicit def ev: Effectful[E, F]
+  implicit def monadError: MonadError[F, E]
 
   /**
     * Laws from cats.effect Effect[F]
     */
   def runAsyncPureProducesRightIO[A](a: A) = {
     val fa = monadError.pure(a)
-    var result: Option[Either[Throwable, A]] = None
-    val read = IO { result.get }
+    var result: Option[Either[E, A]] = None
+    val read = ev delay { result.get }
 
-    ev.runAsync(fa)(e => IO { result = Some(e) }) *> read <-> IO.pure(Right(a))
+    ev.runAsync(fa)(e => ev.delay { result = Some(e) }) *> read <-> ev.pure(a.asRight)
   }
 
-  def runAsyncRaiseErrorProducesLeftIO[A](e: Throwable) = {
+  def runAsyncRaiseErrorProducesLeftIO[A](e: E) = {
     val fa: F[A] = monadError.raiseError(e)
-    var result: Option[Either[Throwable, A]] = None
-    val read = IO { result.get }
+    var result: Option[Either[E, A]] = None
+    val read = ev delay { result.get }
 
-    ev.runAsync(fa)(e => IO { result = Some(e) }) *> read <-> IO.pure(Left(e))
+    ev.runAsync(fa)(e => ev.delay { result = Some(e) }) *> read <-> ev.pure(e.asLeft)
   }
 
-  def runAsyncIgnoresErrorInHandler[A](e: Throwable) = {
+  def runAsyncIgnoresErrorInHandler[A](e: E) = {
     val fa = monadError.pure(())
-    ev.runAsync(fa)(_ => IO.raiseError(e)) <-> IO.pure(())
+    ev.runAsync(fa)(_ => monadError.raiseError(e)) <-> ev.pure(())
   }
 
   def repeatedCallbackIgnored[A](a: A, f: A => A) = {
     var cur = a
     val change = ev delay { cur = f(cur) }
-    val readResult = IO { cur }
+    val readResult = ev delay cur
 
     val double: F[Unit] = ev async { cb =>
       cb(Right(()))
       cb(Right(()))
     }
 
-    val test = ev.runAsync(double *> change) { _ => IO.unit }
+    val test = ev.runAsync(double *> change) { _ => ev.unit }
 
-    test *> readResult <-> IO.pure(f(a))
+    test *> readResult <-> ev.pure(f(a))
   }
 
   /**
@@ -61,7 +63,7 @@ sealed trait EffectfulLaws[F[_]] {
   def asyncRightIsPure[A](a: A) =
     ev.async[A](_(Right(a))) <-> monadError.pure(a)
 
-  def asyncLeftIsRaiseError[A](e: Throwable) =
+  def asyncLeftIsRaiseError[A](e: E) =
     ev.async[A](_(Left(e))) <-> monadError.raiseError(e)
 
   def repeatedAsyncEvaluationNotMemoized[A](a: A, f: A => A) = {
@@ -77,7 +79,7 @@ sealed trait EffectfulLaws[F[_]] {
     change *> change *> read <-> monadError.pure(f(f(a)))
   }
 
-  def propagateErrorsThroughBindAsync[A](t: Throwable) = {
+  def propagateErrorsThroughBindAsync[A](t: E) = {
     val fa = monadError.attempt(monadError.flatMap(ev.async[A](_ (Left(t))))(x => monadError.pure(x)))
 
     fa <-> monadError.pure(Left(t))
@@ -92,10 +94,10 @@ sealed trait EffectfulLaws[F[_]] {
   def suspendConstantIsPureJoin[A](fa: F[A]) =
     ev.suspend(fa) <-> monadError.flatten(monadError.pure(fa))
 
-  def delayThrowIsRaiseError[A](e: Throwable) =
+  def delayThrowIsRaiseError[A](e: E) =
     ev.delay[A](throw e) <-> monadError.raiseError(e)
 
-  def suspendThrowIsRaiseError[A](e: Throwable) =
+  def suspendThrowIsRaiseError[A](e: E) =
     ev.suspend[A](throw e) <-> monadError.raiseError(e)
 
   def unsequencedDelayIsNoop[A](a: A, f: A => A) = {
@@ -114,7 +116,7 @@ sealed trait EffectfulLaws[F[_]] {
     change *> change *> read <-> monadError.pure(f(f(a)))
   }
 
-  def propagateErrorsThroughBindSuspend[A](t: Throwable) = {
+  def propagateErrorsThroughBindSuspend[A](t: E) = {
     val fa = monadError.flatMap(ev.delay[A](throw t))(x => monadError.pure(x))
 
     fa <-> monadError.raiseError(t)
@@ -177,8 +179,9 @@ sealed trait EffectfulLaws[F[_]] {
 
 object EffectfulLaws {
 
-  @inline def apply[F[_]](implicit iev: Effectful[F]): EffectfulLaws[F] =
-    new EffectfulLaws[F] {
-      def ev: Effectful[F] = iev
+  @inline def apply[E, F[_]](implicit ev1: Effectful[E, F], ev2: MonadError[F, E]): EffectfulLaws[E, F] =
+    new EffectfulLaws[E, F] {
+      def ev: Effectful[E, F] = ev1
+      def monadError: MonadError[F, E] = ev2
     }
 }

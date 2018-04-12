@@ -1,7 +1,8 @@
-package http4s.extend
+package http4s.extend.types
 
 import cats.Eq
 import cats.instances.string._
+import http4s.extend.{ExceptionDisplay, NewType}
 
 object MkExceptionDisplay extends NewType {
   def mk(b: String): T = b.asInstanceOf[T]
