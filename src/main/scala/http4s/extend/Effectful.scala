@@ -11,7 +11,7 @@ trait Effectful[E, F[_]] {
 
   def unit: F[Unit]
 
-  def pure[A]: A => F[A]
+  def point[A]: A => F[A]
 
   def delay[A]: (=>A) => F[A]
 
@@ -35,7 +35,7 @@ sealed trait EffectfulInstances {
 
       def unit: IO[Unit] = IO.unit
 
-      def pure[A]: A => IO[A] = IO.pure
+      def point[A]: A => IO[A] = IO.pure
 
       def delay[A]: (=>A) => IO[A] = IO.apply
 
