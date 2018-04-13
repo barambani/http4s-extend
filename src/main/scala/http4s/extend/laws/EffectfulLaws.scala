@@ -1,11 +1,10 @@
 package http4s.extend.laws
 
 import cats.MonadError
-import cats.effect.IO
 import cats.laws._
 import cats.syntax.apply._
-import http4s.extend.Effectful
 import cats.syntax.either._
+import http4s.extend.Effectful
 
 /**
   * Effectful, together with its MonadError evidence, should abide by the same laws as cats.effect.Effect
@@ -18,6 +17,18 @@ sealed trait EffectfulLaws[E, F[_]] {
   implicit def ev: Effectful[E, F]
   implicit def monadError: MonadError[F, E]
 
+//  def delayThrowIsRaiseError[A](e: E) =
+//    ev.delay[A](throw e) <-> monadError.raiseError(e)
+//
+//  def suspendThrowIsRaiseError[A](e: E) =
+//    ev.suspend[A](throw e) <-> monadError.raiseError(e)
+//
+//  def propagateErrorsThroughBindSuspend[A](t: E) = {
+//    val fa = monadError.flatMap(ev.fail[A](throw t))(x => monadError.pure(x))
+//
+//    fa <-> monadError.raiseError(t)
+//  }
+
   /**
     * Laws from cats.effect Effect[F]
     */
@@ -26,7 +37,7 @@ sealed trait EffectfulLaws[E, F[_]] {
     var result: Option[Either[E, A]] = None
     val read = ev delay { result.get }
 
-    ev.runAsync(fa)(e => ev.delay { result = Some(e) }) *> read <-> ev.pure(a.asRight)
+    ev.runAsync(fa)(e => ev.delay { result = Some(e) }) *> read <-> ev.point(a.asRight)
   }
 
   def runAsyncRaiseErrorProducesLeftIO[A](e: E) = {
@@ -34,12 +45,12 @@ sealed trait EffectfulLaws[E, F[_]] {
     var result: Option[Either[E, A]] = None
     val read = ev delay { result.get }
 
-    ev.runAsync(fa)(e => ev.delay { result = Some(e) }) *> read <-> ev.pure(e.asLeft)
+    ev.runAsync(fa)(e => ev.delay { result = Some(e) }) *> read <-> ev.point(e.asLeft)
   }
 
   def runAsyncIgnoresErrorInHandler[A](e: E) = {
     val fa = monadError.pure(())
-    ev.runAsync(fa)(_ => monadError.raiseError(e)) <-> ev.pure(())
+    ev.runAsync(fa)(_ => monadError.raiseError(e)) <-> ev.point(())
   }
 
   def repeatedCallbackIgnored[A](a: A, f: A => A) = {
@@ -54,7 +65,7 @@ sealed trait EffectfulLaws[E, F[_]] {
 
     val test = ev.runAsync(double *> change) { _ => ev.unit }
 
-    test *> readResult <-> ev.pure(f(a))
+    test *> readResult <-> ev.point(f(a))
   }
 
   /**
@@ -94,11 +105,8 @@ sealed trait EffectfulLaws[E, F[_]] {
   def suspendConstantIsPureJoin[A](fa: F[A]) =
     ev.suspend(fa) <-> monadError.flatten(monadError.pure(fa))
 
-  def delayThrowIsRaiseError[A](e: E) =
-    ev.delay[A](throw e) <-> monadError.raiseError(e)
-
-  def suspendThrowIsRaiseError[A](e: E) =
-    ev.suspend[A](throw e) <-> monadError.raiseError(e)
+  def failIsRaiseError[A](e: E) =
+    ev.fail(e) <-> monadError.raiseError(e)
 
   def unsequencedDelayIsNoop[A](a: A, f: A => A) = {
     var cur = a
@@ -114,12 +122,6 @@ sealed trait EffectfulLaws[E, F[_]] {
     val read = ev.delay(cur)
 
     change *> change *> read <-> monadError.pure(f(f(a)))
-  }
-
-  def propagateErrorsThroughBindSuspend[A](t: E) = {
-    val fa = monadError.flatMap(ev.delay[A](throw t))(x => monadError.pure(x))
-
-    fa <-> monadError.raiseError(t)
   }
 
   def bindSuspendsEvaluation[A](fa: F[A], a1: A, f: (A, A) => A) = {
