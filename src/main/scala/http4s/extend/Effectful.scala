@@ -1,9 +1,9 @@
 package http4s.extend
 
 import cats.effect.IO
+import cats.syntax.either._
 
 import scala.util.Either
-import cats.syntax.either._
 
 /**
   * Separation between the effectful stack and the monad error
@@ -55,8 +55,8 @@ private[extend] sealed trait EffectfulInstances {
         fa => cb => fa runAsync cb
     }
 
-  implicit def stringEffectful(implicit I: Iso[Throwable, ExceptionDisplay]): Effectful[ExceptionDisplay, IO] =
-    new Effectful[ExceptionDisplay, IO] {
+  implicit def stringEffectful[E](implicit iso: Iso[Throwable, E]): Effectful[E, IO] =
+    new Effectful[E, IO] {
 
       def unit: IO[Unit] = IO.unit
 
@@ -64,47 +64,31 @@ private[extend] sealed trait EffectfulInstances {
 
       def delay[A]: (=>A) => IO[A] = IO.apply
 
-      def fail[A]: ExceptionDisplay => IO[A] =
-        IO.raiseError _ compose I.from
+      def fail[A]: E => IO[A] =
+        IO.raiseError _ compose iso.from
 
-      def suspend[A]: (=>IO[A]) => IO[A] = IO.suspend
+      def suspend[A]: (=>IO[A]) => IO[A] =
+        IO.suspend
 
-      def attempt[A]: IO[A] => IO[Either[ExceptionDisplay, A]] =
-        _.attempt map (_ leftMap I.to)
+      def attempt[A]: IO[A] => IO[Either[E, A]] =
+        _.attempt map (_ leftMap iso.to)
 
-      def absolve[A]: IO[Either[ExceptionDisplay, A]] => IO[A] =
-        _ flatMap { _.fold(IO.raiseError _ compose I.from, IO.pure) }
+      def absolve[A]: IO[Either[E, A]] => IO[A] =
+        _ flatMap { _.fold(IO.raiseError _ compose iso.from, IO.pure) }
 
-      def async[A]: ((Either[ExceptionDisplay, A] => Unit) => Unit) => IO[A] =
-        action => IO.async {
-          thrAction => action(
-            thrAction compose { (eitherDisp: Either[ExceptionDisplay, A]) => eitherDisp leftMap I.from }
-          )
+      def async[A]: ((Either[E, A] => Unit) => Unit) => IO[A] =
+        asyncAction => IO.async {
+          failingWithThrowable => asyncAction {
+            failingWithThrowable compose { (errorOrA: Either[E, A]) => errorOrA leftMap iso.from }
+          }
         }
 
-      def runAsync[A]: IO[A] => (Either[ExceptionDisplay, A] => IO[Unit]) => IO[Unit] = ???
-    }
-
-  implicit val voidEffectful: Effectful[Void, IO] =
-    new Effectful[Void, IO] {
-
-      def unit: IO[Unit] = IO.unit
-
-      def point[A]: A => IO[A] = IO.pure
-
-      def delay[A]: (=>A) => IO[A] = IO.apply
-
-      def fail[A]: Void => IO[A] = ???
-
-      def suspend[A]: (=>IO[A]) => IO[A] = ???
-
-      def attempt[A]: IO[A] => IO[Either[Void, A]] = ???
-
-      def absolve[A]: IO[Either[Void, A]] => IO[A] = ???
-
-      def async[A]: ((Either[Void, A] => Unit) => Unit) => IO[A] = ???
-
-      def runAsync[A]: IO[A] => (Either[Void, A] => IO[Unit]) => IO[Unit] = ???
+      def runAsync[A]: IO[A] => (Either[E, A] => IO[Unit]) => IO[Unit] =
+        io => action => io.runAsync {
+          failingWithThrowable => action {
+            failingWithThrowable leftMap iso.to
+          }
+        }
     }
 }
 
