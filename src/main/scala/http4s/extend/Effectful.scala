@@ -6,7 +6,12 @@ import cats.syntax.either._
 import scala.util.Either
 
 /**
-  * Separation between the effectful stack and the monad error
+  * Describes the capability of producing effects. The error is explicit and can be any.
+  * An instance for cats.effect.IO and Throwable is provided. It's possible to obtain an instance
+  * for any other error `E` providing a valid instance of `Iso[Throwable, E]`.
+  *
+  * Notice that there's no need to provide an `Iso[Throwable, Throwable]` ad it's automatically
+  * put in scope by `Iso` so an instance of `Effectful[Throwable, IO]` will be always available.
   */
 trait Effectful[E, F[_]] {
 
@@ -30,30 +35,6 @@ trait Effectful[E, F[_]] {
 }
 
 private[extend] sealed trait EffectfulInstances {
-
-  implicit val ioEffectful: Effectful[Throwable, IO] =
-    new Effectful[Throwable, IO] {
-
-      def unit: IO[Unit] = IO.unit
-
-      def point[A]: A => IO[A] = IO.pure
-
-      def delay[A]: (=>A) => IO[A] = IO.apply
-
-      def fail[A]: Throwable => IO[A] = IO.raiseError
-
-      def suspend[A]: (=>IO[A]) => IO[A] = IO.suspend
-
-      def attempt[A]: IO[A] => IO[Either[Throwable, A]] = _.attempt
-
-      def absolve[A]: IO[Either[Throwable, A]] => IO[A] =
-        _ flatMap { _.fold(IO.raiseError, IO.pure) }
-
-      def async[A]: ((Either[Throwable, A] => Unit) => Unit) => IO[A] = IO.async
-
-      def runAsync[A]: IO[A] => (Either[Throwable, A] => IO[Unit]) => IO[Unit] =
-        fa => cb => fa runAsync cb
-    }
 
   implicit def stringEffectful[E](implicit iso: Iso[Throwable, E]): Effectful[E, IO] =
     new Effectful[E, IO] {
