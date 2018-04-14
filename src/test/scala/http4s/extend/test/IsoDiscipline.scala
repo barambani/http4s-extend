@@ -25,4 +25,9 @@ final class IsoDiscipline extends MinimalSuite {
     "Iso[Throwable, Void]",
     IsoLawsChecks[Throwable, Void].iso
   )
+
+  checkAll(
+    "Iso[Throwable, Throwable]",
+    IsoLawsChecks[Throwable, Throwable].iso
+  )
 }
