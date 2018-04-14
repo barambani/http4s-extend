@@ -28,9 +28,6 @@ private[test] sealed trait EffectfulLawsChecks[E, F[_]] extends Laws {
       def parents: Seq[RuleSet] = Nil
 
       val props = Seq(
-//        "throw in delay is raiseError"            -> forAll(laws.delayThrowIsRaiseError[A] _),
-//        "throw in suspend is raiseError"          -> forAll(laws.suspendThrowIsRaiseError[A] _),
-//        "propagate errors through bind (suspend)" -> forAll(laws.propagateErrorsThroughBindSuspend[A] _),
         "runAsync pure produces right IO"         -> forAll(laws.runAsyncPureProducesRightIO[A] _),
         "runAsync raiseError produces left IO"    -> forAll(laws.runAsyncRaiseErrorProducesLeftIO[A] _),
         "runAsync ignores error in handler"       -> forAll(laws.runAsyncIgnoresErrorInHandler[A] _),
