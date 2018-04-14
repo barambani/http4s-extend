@@ -2,7 +2,7 @@ package http4s.extend.test
 
 import cats.Eq
 import cats.effect.laws.util.TestInstances
-import cats.tests.TestSettings
+import cats.tests.{StrictCatsEquality, TestSettings}
 import http4s.extend.ExceptionDisplay
 import http4s.extend.test.laws.instances.ArbitraryInstances
 import org.scalacheck.{Arbitrary, Cogen}
@@ -34,4 +34,5 @@ private[test] object Fixtures {
     with    TestSettings
     with    TestInstances
     with    ArbitraryInstances
+    with    StrictCatsEquality
 }

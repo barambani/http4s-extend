@@ -15,7 +15,6 @@ sealed trait IsoLaws[A, B] {
 }
 
 object IsoLaws {
-
   @inline def apply[A, B](implicit ev: Iso[A, B]): IsoLaws[A, B] =
     new IsoLaws[A, B] {
       val iso: Iso[A, B] = ev
