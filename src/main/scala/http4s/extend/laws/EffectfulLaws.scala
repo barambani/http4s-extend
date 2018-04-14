@@ -17,18 +17,6 @@ sealed trait EffectfulLaws[E, F[_]] {
   implicit def ev: Effectful[E, F]
   implicit def monadError: MonadError[F, E]
 
-//  def delayThrowIsRaiseError[A](e: E) =
-//    ev.delay[A](throw e) <-> monadError.raiseError(e)
-//
-//  def suspendThrowIsRaiseError[A](e: E) =
-//    ev.suspend[A](throw e) <-> monadError.raiseError(e)
-//
-//  def propagateErrorsThroughBindSuspend[A](t: E) = {
-//    val fa = monadError.flatMap(ev.fail[A](throw t))(x => monadError.pure(x))
-//
-//    fa <-> monadError.raiseError(t)
-//  }
-
   /**
     * Laws from cats.effect Effect[F]
     */
