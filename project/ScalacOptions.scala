@@ -64,5 +64,9 @@ object ScalacOptions {
     "-Xlint:strict-unsealed-patmat" // warn on inexhaustive matches against unsealed traits
   )
 
-  val testOnlyOptions: Seq[String] = Seq("-Yrangepos")
+  val testOnlyOptions: Seq[String] = Seq(
+    "-Yrangepos",
+    "-P:splain:implicits:true",
+    "-P:splain:tree:true"
+  )
 }

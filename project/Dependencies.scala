@@ -3,10 +3,11 @@ import sbt._
 object Dependencies {
 
   private[Dependencies] object versionOf {
-    val http4s  = "0.18.8"
-    val monix   = "3.0.0-RC1"
-    val scalaz  = "7.2.21"
-    val cats    = "1.1.0"
+    val http4s    = "0.18.8"
+    val monix     = "3.0.0-RC1"
+    val scalaz    = "7.2.21"
+    val cats      = "1.1.0"
+    val shapeless = "2.3.3"
 
     val scalaCheck      = "1.13.5"
     val catsEffectLaws  = "0.10"
@@ -21,7 +22,8 @@ object Dependencies {
     "org.http4s"    %% "http4s-circe"         % versionOf.http4s,
     "io.monix"      %% "monix"                % versionOf.monix,
     "org.scalaz"    %% "scalaz-concurrent"    % versionOf.scalaz,
-    "org.typelevel" %% "cats-laws"            % versionOf.cats
+    "org.typelevel" %% "cats-laws"            % versionOf.cats,
+    "com.chuusai"   %% "shapeless"            % versionOf.shapeless
   ) map (_.withSources)
 
   val testDependencies: Seq[ModuleID] = Seq(
@@ -31,6 +33,7 @@ object Dependencies {
   )
 
   val compilerPlugins: Seq[ModuleID] = Seq(
-    compilerPlugin("org.spire-math" %% "kind-projector" % versionOf.kindProjector cross CrossVersion.binary)
+    compilerPlugin("org.spire-math" %% "kind-projector" % versionOf.kindProjector cross CrossVersion.binary),
+    compilerPlugin("io.tryp"        %   "splain"        % "0.2.9"                 cross CrossVersion.patch)
   )
 }
