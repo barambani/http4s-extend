@@ -1,6 +1,6 @@
 package http4s.extend.test.laws.instances
 
-import http4s.extend.ExceptionDisplay
+import http4s.extend.{ExceptionDisplay, Void}
 import org.scalacheck.Cogen
 import org.scalacheck.rng.Seed
 
@@ -12,6 +12,9 @@ private[test] trait CogenInstances {
   implicit def futureCogen[A : Cogen]: Cogen[Future[A]] =
     Cogen[Future[A]] { (seed: Seed, t: Future[A]) => Cogen[A].perturb(seed, Await.result(t, 1.second)) }
 
-  implicit def throwableCompleteMessageCogen(implicit ev: Cogen[String]): Cogen[ExceptionDisplay] =
+  implicit def exceptionDisplayCogen(implicit ev: Cogen[String]): Cogen[ExceptionDisplay] =
     ev contramap ExceptionDisplay.unMk
+
+  implicit def voidCogen(implicit ev: Cogen[Unit]): Cogen[Void] =
+    ev contramap Void.unMk
 }
