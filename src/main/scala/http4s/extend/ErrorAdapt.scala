@@ -10,7 +10,7 @@ trait ErrorAdapt[F[_]] {
   def attemptMapLeft[E, A](fa: F[A])(errM: Throwable => E): F[Either[E, A]]
 }
 
-sealed trait ErrorAdaptInstances {
+private[extend] sealed trait ErrorAdaptInstances {
 
   implicit def monixTaskErrorAdapt: ErrorAdapt[MonixTask] =
     new ErrorAdapt[MonixTask] {

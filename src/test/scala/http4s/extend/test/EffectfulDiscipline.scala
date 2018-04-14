@@ -10,6 +10,7 @@ import cats.instances.string._
 import cats.instances.tuple._
 import cats.instances.unit._
 import cats.laws.discipline.MonadErrorTests
+import http4s.extend.{ExceptionDisplay, _}
 import http4s.extend.test.Fixtures.MinimalSuite
 import http4s.extend.test.laws.checks.EffectfulLawsChecks
 import org.scalacheck.Arbitrary.arbDouble
@@ -24,7 +25,17 @@ final class EffectfulDiscipline extends MinimalSuite {
   )
 
   checkAll(
-    "Effectful[IO]",
-    EffectfulLawsChecks[Throwable, IO].effectful[Double]
+    "Effectful[ExceptionDisplay, IO]",
+    EffectfulLawsChecks[ExceptionDisplay, IO].effectful[Double]
+  )
+
+  checkAll(
+    "Effectful[Throwable, IO]",
+    EffectfulLawsChecks[Throwable, IO].effectful[Int]
+  )
+
+  checkAll(
+    "Effectful[Void, IO]",
+    EffectfulLawsChecks[Void, IO].effectful[Int]
   )
 }
