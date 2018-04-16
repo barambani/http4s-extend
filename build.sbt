@@ -1,6 +1,7 @@
 import Dependencies._
 import ScalacOptions._
-import Templates.ArityFunctionsGenerator
+import Templates.{ArityFunctionsGenerator, ArityTestsGenerator}
+import sbt.Keys.sourceGenerators
 
 val typelevelOrganization = "org.typelevel"
 val globalOrganization = scalaOrganization in Global
@@ -56,7 +57,8 @@ val root = project.in(file("."))
   .settings(crossBuildSettings)
   .settings(releaseSettings)
   .settings(
-    sourceGenerators in Compile += ((sourceManaged in Compile) map ArityFunctionsGenerator.run(22)).taskValue
+    sourceGenerators in Compile += ((sourceManaged in Compile) map ArityFunctionsGenerator.run(22)).taskValue,
+    sourceGenerators in Test    += ((sourceManaged in Test) map ArityTestsGenerator.run(22)).taskValue
   )
   .settings(
     name                    :=  "http4s-extend",

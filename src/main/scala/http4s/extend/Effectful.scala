@@ -11,7 +11,7 @@ import scala.util.Either
   * for any other error `E` providing a valid instance of `Iso[Throwable, E]`.
   *
   * Notice that there's no need to provide an `Iso[Throwable, Throwable]` ad it's automatically
-  * put in scope by `Iso` so an instance of `Effectful[Throwable, IO]` will be always available.
+  * put in scope by `Iso`, so an instance of `Effectful[Throwable, IO]` will be always available.
   */
 trait Effectful[E, F[_]] {
 
