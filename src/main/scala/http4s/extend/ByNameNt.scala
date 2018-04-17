@@ -49,9 +49,11 @@ private[extend] sealed trait ByNameNtInstances {
       def apply[A]: (=>MonixTask[A]) => IO[A] = _.toIO
     }
 
-  implicit def scalazTaskToIo(implicit ev: Functor[ScalazTask]): ByNameNt[ScalazTask, IO] =
+  implicit def scalazTaskToIo: ByNameNt[ScalazTask, IO] =
     new ByNameNt[ScalazTask, IO] {
-      val evF = ev
+      val evF = new Functor[ScalazTask] {
+        def map[A, B](fa: ScalazTask[A])(f: A => B): ScalazTask[B] = fa map f
+      }
       val evG = Functor[IO]
 
       def apply[A]: (=>ScalazTask[A]) => IO[A] =
