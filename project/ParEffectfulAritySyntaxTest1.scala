@@ -11,7 +11,7 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
   def expandTo: Int => String =
     maxArity => {
 
-      val syntaxTraitTop =
+      val staticTop =
         static"""package http4s.extend.test
           |
           |import cats.Semigroup
@@ -37,9 +37,9 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
           |        CompositeException(x, y, Nil)
           |    }
           |
-          |  def eff = Effectful[Throwable, IO]"""
+          |  def effIo = Effectful[Throwable, IO]"""
 
-      val syntaxTraitBottom = static"""}"""
+      val staticBottom = static"""}"""
 
       def testArityBlock: Int => String =
         arity => {
@@ -52,8 +52,8 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
           lazy val `e0: Throwable..en-1: Throwable` =
             `sym e0..en-1` map (e => s"$e: Throwable") mkString ", "
 
-          lazy val `eff.fail[Int](e0)..eff.fail[Int](en-1)` =
-            `sym e0..en-1` map (e => s"eff.fail[Int]($e)") mkString ", "
+          lazy val `effIo.fail[Int](e0)..effIo.fail[Int](en-1)` =
+            `sym e0..en-1` map (e => s"effIo.fail[Int]($e)") mkString ", "
 
           lazy val `(e1 combine e2) ... combine en-1` =
             leftAssociativeExpansionOf(`sym e0..en-1`)("")(" combine ")
@@ -61,13 +61,13 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
           static"""
             |  test("$arityS io errors are accumulated by parMap") {
             |    Prop.forAll { (${`e0: Throwable..en-1: Throwable`}) => {
-            |      (${`eff.fail[Int](e0)..eff.fail[Int](en-1)`}).parMap{ ${`(_, ... , _)`} => () } <-> eff.fail[Unit](${`(e1 combine e2) ... combine en-1`})
+            |      (${`effIo.fail[Int](e0)..effIo.fail[Int](en-1)`}).parMap{ ${`(_, ... , _)`} => () } <-> effIo.fail[Unit](${`(e1 combine e2) ... combine en-1`})
             |    }}
             |  }""".stripMargin
         }
 
-      s"""$syntaxTraitTop
+      s"""$staticTop
          |${testArityBlock.expandedTo(maxArity, skip = 1)}
-         |$syntaxTraitBottom""".stripMargin
+         |$staticBottom""".stripMargin
     }
 }
