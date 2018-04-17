@@ -5,9 +5,9 @@ import cats.effect.IO
 import cats.effect.laws.discipline.arbitrary._
 import cats.effect.laws.util.TestContext
 import cats.instances.double._
-import cats.instances.string._
 import cats.instances.either._
 import cats.instances.int._
+import cats.instances.string._
 import cats.instances.unit._
 import cats.laws._
 import cats.laws.discipline._
@@ -37,21 +37,21 @@ final class EffectfulDiscipline extends MinimalSuite {
   )
 
   test("Effectful[Throwable, IO]: throw a Throwable in delay is raiseError"){
-    check(Prop.forAll {
+    Prop.forAll {
       e: Throwable =>
         Effectful[Throwable, IO].delay[Int](throw e) <-> MonadError[IO, Throwable].raiseError[Int](e)
-    })
+    }
   }
 
   test("Effectful[Throwable, IO]: throw a Throwable in suspend is raiseError"){
-    check(Prop.forAll {
+    Prop.forAll {
       e: Throwable =>
         Effectful[Throwable, IO].suspend[String](throw e) <-> MonadError[IO, Throwable].raiseError[String](e)
-    })
+    }
   }
 
   test("Effectful[Throwable, IO]: propagate errors through bind (suspend)"){
-    check(Prop.forAll {
+    Prop.forAll {
       e: Throwable => {
 
         val monadError = MonadError[IO, Throwable]
@@ -59,6 +59,6 @@ final class EffectfulDiscipline extends MinimalSuite {
 
         fa <-> monadError.raiseError[Double](e)
       }
-    })
+    }
   }
 }

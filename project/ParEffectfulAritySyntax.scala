@@ -23,7 +23,7 @@ private[Templates] object ParEffectfulAritySyntax extends Template {
           val expansion = BlockMembersExpansions(arity)
           import expansion._
 
-          static"""|  implicit def parEffectfulSyntax$arityS[F[_] : ParEffectful, ${`A0..An-1`}](t$arityS: (${`F[A0]..F[An-1]`})) = new Tuple${arityS}ParEffectfulOps(t$arityS)""".stripMargin
+          static"""|  implicit def parEffectfulSyntax$arityS[F[_], ${`A0..An-1`}](t$arityS: (${`F[A0]..F[An-1]`})) = new Tuple${arityS}ParEffectfulOps(t$arityS)""".stripMargin
         }
 
       val syntaxTraitBottom = static"""}"""
@@ -38,9 +38,9 @@ private[Templates] object ParEffectfulAritySyntax extends Template {
             List.fill(arity)(s"t$arityS") zip `sym _1.._n` map { case (t, n) => s"$t.$n" } mkString ", "
 
           static"""
-            |private[syntax] final class Tuple${arityS}ParEffectfulOps[F[_] : ParEffectful, ${`A0..An-1`}](t$arityS: (${`F[A0]..F[An-1]`})) {
-            |  def parMap[R](f: (${`A0..An-1`}) => R): F[R] = ParEffectful.parMap$arityS(${`t._1..t._n`})(f)
-            |  def parTupled: F[(${`A0..An-1`})] = ParEffectful.parTupled$arityS(${`t._1..t._n`})
+            |private[syntax] final class Tuple${arityS}ParEffectfulOps[F[_], ${`A0..An-1`}](t$arityS: (${`F[A0]..F[An-1]`})) {
+            |  def parMap[R](f: (${`A0..An-1`}) => R)(implicit F: ParEffectful[F]): F[R] = ParEffectful.parMap$arityS(${`t._1..t._n`})(f)
+            |  def parTupled(implicit F: ParEffectful[F]): F[(${`A0..An-1`})] = ParEffectful.parTupled$arityS(${`t._1..t._n`})
             |}""".stripMargin
         }
 
