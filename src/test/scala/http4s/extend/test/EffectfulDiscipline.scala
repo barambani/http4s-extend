@@ -1,6 +1,5 @@
 package http4s.extend.test
 
-import cats.MonadError
 import cats.effect.IO
 import cats.effect.laws.discipline.arbitrary._
 import cats.effect.laws.util.TestContext
@@ -11,53 +10,78 @@ import cats.instances.string._
 import cats.instances.unit._
 import cats.laws._
 import cats.laws.discipline._
+import cats.{Eq, MonadError}
 import http4s.extend.test.Fixtures.MinimalSuite
 import http4s.extend.test.laws.checks.EffectfulLawsChecks
-import http4s.extend.{ExceptionDisplay, _}
+import http4s.extend.util.ThrowableInstances
+import http4s.extend.{Effectful, ExceptionDisplay, Void}
 import org.scalacheck.Arbitrary.arbDouble
-import org.scalacheck.Prop
+import org.scalacheck.{Arbitrary, Prop}
+import scalaz.concurrent.{Task => ScalazTask}
 
-final class EffectfulDiscipline extends MinimalSuite {
+final class EffectfulDiscipline extends MinimalSuite with ThrowableInstances {
 
   implicit val C = TestContext()
 
-  checkAll(
-    "Effectful[ExceptionDisplay, IO]",
-    EffectfulLawsChecks[ExceptionDisplay, IO].effectful[Double]
-  )
+  effectfulDisciplineOf[IO]("IO")
+  effectfulDisciplineOf[ScalazTask]("Scalaz Task")
 
-  checkAll(
-    "Effectful[Throwable, IO]",
-    EffectfulLawsChecks[Throwable, IO].effectful[Int]
-  )
+  private def effectfulDisciplineOf[F[_]](effectName: String)(
+    implicit
+      ev1: Effectful[ExceptionDisplay, F],
+      ev2: Effectful[Throwable, F],
+      ev3: Effectful[Void, F],
+      ev4: MonadError[F, Throwable],
+      ev5: MonadError[F, ExceptionDisplay],
+      ev6: MonadError[F, Void],
+      AFD: Arbitrary[F[Double]],
+      AFI: Arbitrary[F[Int]],
+      EFD: Eq[F[Double]],
+      EFI: Eq[F[Int]],
+      EFU: Eq[F[Unit]],
+      EFS: Eq[F[String]],
+      EED: Eq[F[Either[ExceptionDisplay, Double]]],
+      EEI: Eq[F[Either[Throwable, Int]]],
+      EEV: Eq[F[Either[Void, Int]]]) = {
 
-  checkAll(
-    "Effectful[Void, IO]",
-    EffectfulLawsChecks[Void, IO].effectful[Int]
-  )
+    checkAll(
+      s"Effectful[ExceptionDisplay, $effectName]",
+      EffectfulLawsChecks[ExceptionDisplay, F].effectful[Double]
+    )
 
-  test("Effectful[Throwable, IO]: throw a Throwable in delay is raiseError"){
-    Prop.forAll {
-      e: Throwable =>
-        Effectful[Throwable, IO].delay[Int](throw e) <-> MonadError[IO, Throwable].raiseError[Int](e)
+    checkAll(
+      s"Effectful[Throwable, $effectName]",
+      EffectfulLawsChecks[Throwable, F].effectful[Int]
+    )
+
+    checkAll(
+      s"Effectful[Void, $effectName]",
+      EffectfulLawsChecks[Void, F].effectful[Int]
+    )
+
+    test(s"Effectful[Throwable, $effectName]: throw a Throwable in delay is raiseError"){
+      Prop.forAll {
+        e: Throwable =>
+          Effectful[Throwable, F].delay[Int](throw e) <-> MonadError[F, Throwable].raiseError[Int](e)
+      }
     }
-  }
 
-  test("Effectful[Throwable, IO]: throw a Throwable in suspend is raiseError"){
-    Prop.forAll {
-      e: Throwable =>
-        Effectful[Throwable, IO].suspend[String](throw e) <-> MonadError[IO, Throwable].raiseError[String](e)
+    test(s"Effectful[Throwable, $effectName]: throw a Throwable in suspend is raiseError"){
+      Prop.forAll {
+        e: Throwable =>
+          Effectful[Throwable, F].suspend[String](throw e) <-> MonadError[F, Throwable].raiseError[String](e)
+      }
     }
-  }
 
-  test("Effectful[Throwable, IO]: propagate errors through bind (suspend)"){
-    Prop.forAll {
-      e: Throwable => {
+    test(s"Effectful[Throwable, $effectName]: propagate errors through bind (suspend)"){
+      Prop.forAll {
+        e: Throwable => {
 
-        val monadError = MonadError[IO, Throwable]
-        val fa = monadError.flatMap(Effectful[Throwable, IO].delay[Double](throw e))(x => monadError.pure[Double](x))
+          val monadError = MonadError[F, Throwable]
+          val fa = monadError.flatMap(Effectful[Throwable, F].delay[Double](throw e))(x => monadError.pure[Double](x))
 
-        fa <-> monadError.raiseError[Double](e)
+          fa <-> monadError.raiseError[Double](e)
+        }
       }
     }
   }

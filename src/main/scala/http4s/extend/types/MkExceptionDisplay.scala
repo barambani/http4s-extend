@@ -1,17 +1,19 @@
 package http4s.extend.types
 
+import cats.Eq
 import cats.instances.string._
-import cats.{Eq, MonadError}
 import http4s.extend.{ExceptionDisplay, Iso, NewType}
 
-object MkExceptionDisplay extends NewType with ExceptionDisplayTypeclassInstances {
+import scala.annotation.tailrec
+
+object MkExceptionDisplay extends NewType with ExceptionDisplayCatsTypeclassInstances with ExceptionDisplayFunctions {
 
   def mk(b: String): T = b.asInstanceOf[T]
   def unMk(t: T): String = t.asInstanceOf[String]
   def mkF[F[_]](fs: F[String]): F[T] = fs.asInstanceOf[F[T]]
 }
 
-private[types] sealed trait ExceptionDisplayTypeclassInstances {
+private[types] sealed trait ExceptionDisplayCatsTypeclassInstances {
 
   implicit val exceptionDisplayEq: Eq[ExceptionDisplay] =
     Eq.by[ExceptionDisplay, String](ExceptionDisplay.unMk)
@@ -19,14 +21,15 @@ private[types] sealed trait ExceptionDisplayTypeclassInstances {
   implicit val isoThrowable: Iso[Throwable, ExceptionDisplay] =
     new Iso[Throwable, ExceptionDisplay] {
 
-      import http4s.extend.util.ThrowableModule._
+      def to: Throwable => ExceptionDisplay =
+        ExceptionDisplay.fullDisplay
 
-      def to: Throwable => ExceptionDisplay = fullDisplay
-      def from: ExceptionDisplay => Throwable = throwableOf
+      def from: ExceptionDisplay => Throwable =
+        ExceptionDisplay.throwableOf
     }
 
-  implicit def monadError[F[_], E](implicit M: MonadError[F, E], I: Iso[E, ExceptionDisplay]): MonadError[F, ExceptionDisplay] =
-    new MonadError[F, ExceptionDisplay] {
+  implicit def monadError[F[_], E](implicit M: cats.MonadError[F, E], I: Iso[E, ExceptionDisplay]): cats.MonadError[F, ExceptionDisplay] =
+    new cats.MonadError[F, ExceptionDisplay] {
 
       def raiseError[A](e: ExceptionDisplay): F[A] =
         (M.raiseError[A] _ compose I.from)(e)
@@ -37,5 +40,51 @@ private[types] sealed trait ExceptionDisplayTypeclassInstances {
       def pure[A](x: A): F[A] = M.pure(x)
       def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B] = M.flatMap(fa)(f)
       def tailRecM[A, B](a: A)(f: A => F[Either[A, B]]): F[B] = M.tailRecM(a)(f)
+    }
+}
+
+private[types] sealed trait ExceptionDisplayScalazTypeclassInstances {
+
+  implicit def scalazMonadError[F[_], E](implicit M: scalaz.MonadError[F, E], I: Iso[E, ExceptionDisplay]): cats.MonadError[F, ExceptionDisplay] =
+    new cats.MonadError[F, ExceptionDisplay] {
+
+      def raiseError[A](e: ExceptionDisplay): F[A] =
+        (M.raiseError[A] _ compose I.from)(e)
+
+      def handleErrorWith[A](fa: F[A])(f: ExceptionDisplay => F[A]): F[A] =
+        M.handleError(fa)(f compose I.to)
+
+      def pure[A](x: A): F[A] = M.pure(x)
+      def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B] = M.bind(fa)(f)
+      def tailRecM[A, B](a: A)(f: A => F[Either[A, B]]): F[B] = ??? //M.tailRecM(a)(f)
+    }
+}
+
+private[types] sealed trait ExceptionDisplayFunctions {
+
+  private val separator = "\n\rcaused by "
+
+  def throwableOf: ExceptionDisplay => Throwable =
+    xs => throwableHierarchy {
+      ExceptionDisplay.unMk(xs).split(separator).toSeq map ExceptionDisplay.mk
+    }
+
+  def throwableHierarchy: Seq[ExceptionDisplay] => Throwable =
+    xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(ExceptionDisplay.unMk(m), th) }
+
+  def fullDisplay: Throwable => ExceptionDisplay =
+    th => ExceptionDisplay.mk(s"${ flatMessages(th) mkString separator }")
+
+  def flatMessages: Throwable => Seq[ExceptionDisplay] =
+    th => {
+
+      @tailrec
+      def loop(c: Option[Throwable], acc: =>Vector[ExceptionDisplay]): Vector[ExceptionDisplay] =
+        c match {
+          case Some(inTh) => loop(Option(inTh.getCause), acc :+ ExceptionDisplay.mk(inTh.getMessage))
+          case None       => acc
+        }
+
+      loop(Option(th), Vector.empty)
     }
 }

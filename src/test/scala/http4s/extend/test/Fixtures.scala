@@ -4,7 +4,7 @@ import cats.Eq
 import cats.effect.laws.util.TestInstances
 import cats.tests.TestSettings
 import http4s.extend.ExceptionDisplay
-import http4s.extend.test.laws.instances.{ArbitraryInstances, CogenInstances}
+import http4s.extend.test.laws.instances.{ArbitraryInstances, CogenInstances, EqTestInstances}
 import org.scalacheck.{Arbitrary, Cogen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSuite, Matchers}
@@ -35,4 +35,5 @@ private[test] object Fixtures {
     with    TestInstances
     with    ArbitraryInstances
     with    CogenInstances
+    with    EqTestInstances
 }
