@@ -44,15 +44,23 @@ private[Templates] final case class BlockMembersExpansions(private val upToArity
   lazy val `fa0..fan-1`     = `sym fa0..fan-1` mkString ", "
   lazy val `F[A0]..F[An-1]` = `sym F[A0]..F[An-1]` mkString ", "
 
+  lazy val `(_, ... , _)` =
+    List.fill(upToArity)("_") mkString ("(", ", ", ")")
+
   lazy val `fa0: =>F[A0]..fan-1: =>F[An-1]` =
     `sym fa0..fan-1` zip `sym F[A0]..F[An-1]` map { case (fa, f) => s"$fa: =>$f" } mkString ", "
+
+  def leftAssociativeExpansionOf: Seq[String] => String => String => String =
+    symbols => prefix => separator =>
+      if(symbols.size < 2) ""
+      else symbols.drop(2).foldLeft(s"(${symbols.head}$separator${symbols.drop(1).head})")((exp, an) => s"($prefix$exp$separator$an)")
 
   def rightAssociativeExpansionOf: Seq[String] => String => String =
     symbols => prefix =>
       if(symbols.size <= 2) ""
       else symbols.dropRight(2).foldRight(s"(${symbols.dropRight(1).last}, ${symbols.last})")((an, exp) => s"($an, $prefix$exp)")
 
-  private def arityRange: Range = 0 until upToArity
+  private[Templates] def arityRange: Range = 0 until upToArity
 }
 
 private[Templates] object BlockSyntax {

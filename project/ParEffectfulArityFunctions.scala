@@ -39,7 +39,7 @@ private[Templates] object ParEffectfulArityFunctions extends Template {
              |    ParEffectful.parMap2${`(a0..ParEffectful.parTupled2(a1..ParEffectful.parTupled2(an-2, an-1)`} { case ${`(a0..(a1..(an-2, an-1)`} => f(${`a0..an-1`}) }
              |
              |  def parTupled$arityS[F[_] : ParEffectful, ${`A0..An-1`}](${`fa0: =>F[A0]..fan-1: =>F[An-1]`}): F[(${`A0..An-1`})] =
-             |    parMap${arity.toString}(${`fa0..fan-1`})(Tuple$arityS.apply)""".stripMargin
+             |    ParEffectful.parMap2${`(a0..ParEffectful.parTupled2(a1..ParEffectful.parTupled2(an-2, an-1)`} { case ${`(a0..(a1..(an-2, an-1)`} => Tuple$arityS.apply(${`a0..an-1`}) }""".stripMargin
         }
 
       val bottom = static"""}"""

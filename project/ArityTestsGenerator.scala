@@ -8,5 +8,6 @@ object ArityTestsGenerator {
     BoilerplateGenerator(templates).run
 
   private val templates: Seq[Template] = Seq(
+    ParEffectfulAritySyntaxTest1
   )
 }

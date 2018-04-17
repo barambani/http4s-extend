@@ -58,7 +58,7 @@ val root = project.in(file("."))
   .settings(releaseSettings)
   .settings(
     sourceGenerators in Compile += ((sourceManaged in Compile) map ArityFunctionsGenerator.run(22)).taskValue,
-    sourceGenerators in Test    += ((sourceManaged in Test) map ArityTestsGenerator.run(22)).taskValue
+    sourceGenerators in Test    += ((sourceManaged in Test) map ArityTestsGenerator.run(8)).taskValue
   )
   .settings(
     name                    :=  "http4s-extend",
