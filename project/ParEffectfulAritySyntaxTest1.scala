@@ -26,6 +26,7 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
           |import http4s.extend.syntax.parEffectful._
           |import http4s.extend.test.Fixtures.MinimalSuite
           |import org.scalacheck.Prop
+          |import scalaz.concurrent.{Task => ScalazTask}
           |
           |final class ParEffectfulSyntaxAccumulateErrorTests extends MinimalSuite {
           |
@@ -37,7 +38,8 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
           |        CompositeException(x, y, Nil)
           |    }
           |
-          |  def ioEff = Effectful[Throwable, IO]"""
+          |  def ioEff = Effectful[Throwable, IO]
+          |  def scalazTaskEff = Effectful[Throwable, ScalazTask]"""
 
       val staticBottom = static"""}"""
 
@@ -55,6 +57,9 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
           lazy val `ioEff.fail[Int](e0)..ioEff.fail[Int](en-1)` =
             `sym e0..en-1` map (e => s"ioEff.fail[Int]($e)") mkString ", "
 
+          lazy val `scalazTaskEff.fail[Int](e0)..scalazTaskEff.fail[Int](en-1)` =
+            `sym e0..en-1` map (e => s"scalazTaskEff.fail[Int]($e)") mkString ", "
+
           lazy val `(e1 combine e2) ... combine en-1` =
             leftAssociativeExpansionOf(`sym e0..en-1`)("")(" combine ")
 
@@ -62,6 +67,12 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
             |  test("$arityS io errors are accumulated by parMap") {
             |    Prop.forAll { (${`e0: Throwable..en-1: Throwable`}) => {
             |      (${`ioEff.fail[Int](e0)..ioEff.fail[Int](en-1)`}).parMap{ ${`(_, ... , _)`} => () } <-> ioEff.fail[Unit](${`(e1 combine e2) ... combine en-1`})
+            |    }}
+            |  }
+            |
+            |  test("$arityS scalaz task errors are accumulated by parMap") {
+            |    Prop.forAll { (${`e0: Throwable..en-1: Throwable`}) => {
+            |      (${`scalazTaskEff.fail[Int](e0)..scalazTaskEff.fail[Int](en-1)`}).parMap{ ${`(_, ... , _)`} => () } <-> scalazTaskEff.fail[Unit](${`(e1 combine e2) ... combine en-1`})
             |    }}
             |  }""".stripMargin
         }

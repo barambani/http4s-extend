@@ -32,7 +32,7 @@ sealed trait ByNameNt[F[_], G[_]] {
 
 private[extend] sealed trait ByNameNtInstances {
 
-  implicit def futureToIo(implicit ec: ExecutionContext): ByNameNt[Future, IO] =
+  implicit def futureToIo(implicit ec: ExecutionContext): Future ~~> IO =
     new ByNameNt[Future, IO] {
       val evF = Functor[Future]
       val evG = Functor[IO]
@@ -41,7 +41,7 @@ private[extend] sealed trait ByNameNtInstances {
         IO.fromFuture[A] _ compose IO.eval[Future[A]] compose always
     }
 
-  implicit def monixTaskToIo(implicit s: Scheduler): ByNameNt[MonixTask, IO] =
+  implicit def monixTaskToIo(implicit s: Scheduler): MonixTask ~~> IO =
     new ByNameNt[MonixTask, IO] {
       val evF = Functor[MonixTask]
       val evG = Functor[IO]
@@ -49,11 +49,9 @@ private[extend] sealed trait ByNameNtInstances {
       def apply[A]: (=>MonixTask[A]) => IO[A] = _.toIO
     }
 
-  implicit def scalazTaskToIo: ByNameNt[ScalazTask, IO] =
+  implicit def scalazTaskToIo: ScalazTask ~~> IO =
     new ByNameNt[ScalazTask, IO] {
-      val evF = new Functor[ScalazTask] {
-        def map[A, B](fa: ScalazTask[A])(f: A => B): ScalazTask[B] = fa map f
-      }
+      val evF = scalazTaskFunctor
       val evG = Functor[IO]
 
       def apply[A]: (=>ScalazTask[A]) => IO[A] =
@@ -63,6 +61,22 @@ private[extend] sealed trait ByNameNtInstances {
             a => IO.pure(a)
           )
         ).value
+    }
+
+  implicit def ioToScalazTask: IO ~~> ScalazTask =
+    new ByNameNt[IO, ScalazTask] {
+      val evF = Functor[IO]
+      val evG = scalazTaskFunctor
+
+      def apply[A]: (=>IO[A]) => ScalazTask[A] =
+        fa => Eval.always(
+          fa.attempt.unsafeRunSync.fold(ScalazTask.fail, a => ScalazTask.delay(a))
+        ).value
+    }
+
+  private def scalazTaskFunctor: Functor[ScalazTask] =
+    new Functor[ScalazTask] {
+      def map[A, B](fa: ScalazTask[A])(f: A => B): ScalazTask[B] = fa map f
     }
 }
 

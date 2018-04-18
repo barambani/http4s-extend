@@ -12,8 +12,8 @@ private[syntax] trait ByNameNtSyntax {
 }
 
 private[syntax] final class ByNameNtOps[F[_], A](fa: F[A]) {
-  def to[G[_]](implicit nt: F ~~> G): G[A] = nt.apply(fa)
-  def ~~>[G[_] : F ~~> ?[_]]: G[A] = to
+  def transformTo[G[_]](implicit nt: F ~~> G): G[A] = nt.apply(fa)
+  def ~~>[G[_] : F ~~> ?[_]]: G[A] = transformTo
 }
 
 private[syntax] final class ByNameEitherNtOps[F[_], A, E](fa: =>F[Either[E, A]]) {

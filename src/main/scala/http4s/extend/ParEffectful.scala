@@ -4,6 +4,7 @@ import cats.effect.{Effect, IO}
 import cats.syntax.apply._
 import cats.syntax.either._
 import cats.{Applicative, Id, Monoid, Semigroup, Traverse}
+import scalaz.concurrent.{Task => ScalazTask}
 
 import scala.concurrent.ExecutionContext
 
@@ -34,6 +35,15 @@ private[extend] sealed trait ParEffectfulInstances {
               }
             )
         } flatMap identity
+    }
+
+  implicit def scalazTaskEffectfulOp(implicit ev: ParEffectful[IO]): ParEffectful[ScalazTask] =
+    new ParEffectful[ScalazTask] {
+
+      import http4s.extend.syntax.byNameNt._
+
+      def parMap2[A, B, R](fa: =>ScalazTask[A], fb: =>ScalazTask[B])(f: (A, B) => R): ScalazTask[R] =
+        ev.parMap2(fa.transformTo[IO], fb.transformTo[IO])(f).transformTo[ScalazTask]
     }
 }
 
