@@ -11,10 +11,12 @@ import cats.instances.tuple._
 import cats.instances.unit._
 import cats.laws.discipline.MonadErrorTests
 import http4s.extend.test.Fixtures.MinimalSuite
+import http4s.extend.util.ThrowableInstances
 import http4s.extend.{ExceptionDisplay, Void}
 import org.scalacheck.Arbitrary.arbDouble
+import scalaz.concurrent.{Task => ScalazTask}
 
-final class MonadErrorDiscipline extends MinimalSuite {
+final class MonadErrorDiscipline extends MinimalSuite with ThrowableInstances {
 
   implicit val C = TestContext()
 
@@ -33,4 +35,18 @@ final class MonadErrorDiscipline extends MinimalSuite {
     MonadErrorTests[IO, Void].monadError[String, Int, Double]
   )
 
+  checkAll(
+    "MonadError[ScalazTask, ExceptionDisplay]",
+    MonadErrorTests[ScalazTask, ExceptionDisplay].monadError[String, Int, Double]
+  )
+
+  checkAll(
+    "MonadError[ScalazTask, Throwable]",
+    MonadErrorTests[ScalazTask, Throwable].monadError[String, Int, Double]
+  )
+
+  checkAll(
+    "MonadError[ScalazTask, Void]",
+    MonadErrorTests[ScalazTask, Void].monadError[String, Int, Double]
+  )
 }
