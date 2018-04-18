@@ -7,7 +7,7 @@ import http4s.extend.{ExceptionDisplay, Iso, NewType}
 
 object MkExceptionDisplay extends NewType with ExceptionDisplayCatsTypeclassInstances with ExceptionDisplayFunctions {
 
-  def mk(b: String): T = b.asInstanceOf[T]
+  def apply(b: String): T = b.asInstanceOf[T]
   def unMk(t: T): String = t.asInstanceOf[String]
   def mkF[F[_]](fs: F[String]): F[T] = fs.asInstanceOf[F[T]]
 }
@@ -54,14 +54,14 @@ private[types] sealed trait ExceptionDisplayFunctions {
 
   def throwableOf: ExceptionDisplay => Throwable =
     xs => throwableHierarchy {
-      ExceptionDisplay.unMk(xs).split(separator).toSeq map ExceptionDisplay.mk
+      ExceptionDisplay.unMk(xs).split(separator).toSeq map ExceptionDisplay.apply
     }
 
   def throwableHierarchy: Seq[ExceptionDisplay] => Throwable =
     xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(ExceptionDisplay.unMk(m), th) }
 
   def fullDisplay: Throwable => ExceptionDisplay =
-    th => ExceptionDisplay.mk(s"${ flatMessages(th) mkString separator }")
+    th => ExceptionDisplay(s"${ flatMessages(th) mkString separator }")
 
   def flatMessages: Throwable => Seq[ExceptionDisplay] =
     th => {
@@ -69,7 +69,7 @@ private[types] sealed trait ExceptionDisplayFunctions {
       @scala.annotation.tailrec
       def loop(c: Option[Throwable], acc: =>Vector[ExceptionDisplay]): Vector[ExceptionDisplay] =
         c match {
-          case Some(inTh) => loop(Option(inTh.getCause), acc :+ ExceptionDisplay.mk(inTh.getMessage))
+          case Some(inTh) => loop(Option(inTh.getCause), acc :+ ExceptionDisplay(inTh.getMessage))
           case None       => acc
         }
 

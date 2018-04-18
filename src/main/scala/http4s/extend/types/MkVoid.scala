@@ -5,7 +5,7 @@ import http4s.extend.util.MonadErrorUtil
 import http4s.extend.{Iso, NewType, Void}
 
 object MkVoid extends NewType with VoidCatsTypeclassInstances {
-  def mk(b: Unit): T = b.asInstanceOf[T]
+  def apply(b: Unit): T = b.asInstanceOf[T]
   def unMk(t: T): Unit = t.asInstanceOf[Unit]
   def mkF[F[_]](fs: F[Unit]): F[T] = fs.asInstanceOf[F[T]]
 }
@@ -19,7 +19,7 @@ private[types] sealed trait VoidCatsTypeclassInstances extends VoidScalazTypecla
 
   implicit val isoThrowable: Iso[Throwable, Void] =
     new Iso[Throwable, Void] {
-      def to: Throwable => Void = _ => Void.mk(())
+      def to: Throwable => Void = _ => Void(())
       def from: Void => Throwable = _ =>  new Exception("Undefined")
     }
 
