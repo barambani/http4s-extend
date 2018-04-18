@@ -9,11 +9,11 @@ private[test] trait ArbitraryInstances {
 
   implicit val arbVoid: Arbitrary[Void] =
     Arbitrary[Void] {
-      Gen.const[Void](Void.mk(()))
+      Gen.const[Void](Void(()))
     }
 
   implicit def throwableCompleteMessageArb(implicit A: Arbitrary[String]): Arbitrary[ExceptionDisplay] =
-    Arbitrary { A.arbitrary map ExceptionDisplay.mk }
+    Arbitrary { A.arbitrary map ExceptionDisplay.apply }
 
   implicit def scalazTaskArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[ScalazTask[A]] =
      Arbitrary { A.arbitrary map (ScalazTask.delay(_)) }

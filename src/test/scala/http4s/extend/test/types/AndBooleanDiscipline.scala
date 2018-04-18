@@ -6,12 +6,9 @@ import http4s.extend.test.Fixtures.MinimalSuite
 final class AndBooleanDiscipline extends MinimalSuite {
 
   test("typed AND correct evaluation"){
-
-    import AndBoolean._
-
-    (mk(true)   =&&= mk(true))  should be(mk(true))
-    (mk(true)   =&&= mk(false)) should be(mk(false))
-    (mk(false)  =&&= mk(true))  should be(mk(false))
-    (mk(false)  =&&= mk(false)) should be(mk(false))
+    (AndBoolean(true)   =&&= AndBoolean(true))  should be(AndBoolean(true))
+    (AndBoolean(true)   =&&= AndBoolean(false)) should be(AndBoolean(false))
+    (AndBoolean(false)  =&&= AndBoolean(true))  should be(AndBoolean(false))
+    (AndBoolean(false)  =&&= AndBoolean(false)) should be(AndBoolean(false))
   }
 }
