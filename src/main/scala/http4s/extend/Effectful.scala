@@ -2,8 +2,6 @@ package http4s.extend
 
 import cats.effect.IO
 import cats.syntax.either._
-import scalaz.\/
-import scalaz.concurrent.{Task => ScalazTask}
 
 import scala.util.Either
 
@@ -72,46 +70,6 @@ private[extend] sealed trait EffectfulInstances {
             failingWithThrowable leftMap iso.to
           }
         }
-    }
-
-  implicit def scalazTaskEffectful[E](implicit iso: Iso[Throwable, E]): Effectful[E, ScalazTask] =
-    new Effectful[E, ScalazTask] {
-
-      def unit: ScalazTask[Unit] = ScalazTask.now(())
-
-      def point[A]: A => ScalazTask[A] = ScalazTask.now
-
-      def delay[A]: (=>A) => ScalazTask[A] = ScalazTask.delay
-
-      def fail[A]: E => ScalazTask[A] =
-        ScalazTask.fail _ compose iso.from
-
-      def suspend[A]: (=>ScalazTask[A]) => ScalazTask[A] =
-        ScalazTask.suspend
-
-      def attempt[A]: ScalazTask[A] => ScalazTask[Either[E, A]] =
-        _.attempt map (_.toEither leftMap iso.to)
-
-      def absolve[A]: ScalazTask[Either[E, A]] => ScalazTask[A] =
-        _ flatMap { _.fold(ScalazTask.fail _ compose iso.from, ScalazTask.now) }
-
-      def async[A]: ((Either[E, A] => Unit) => Unit) => ScalazTask[A] =
-        asyncAction => ScalazTask.async {
-          failingWithThrowable => asyncAction(
-            failingWithThrowable
-              compose { (disjOrA: \/[E, A]) => disjOrA leftMap iso.from }
-              compose { (eitherOrA: Either[E, A]) => \/.fromEither(eitherOrA) }
-          )
-        }
-
-      def runAsync[A]: ScalazTask[A] => (Either[E, A] => ScalazTask[Unit]) => ScalazTask[Unit] =
-        task => action => ScalazTask.delay(
-          task.unsafePerformAsync {
-            failingWithThrowable => action {
-              failingWithThrowable.toEither leftMap iso.to
-            }.unsafePerformAsync(_ => ())
-          }
-        )
     }
 }
 

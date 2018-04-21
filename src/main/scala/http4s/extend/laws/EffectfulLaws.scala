@@ -43,17 +43,15 @@ sealed trait EffectfulLaws[E, F[_]] {
 
   def repeatedCallbackIgnored[A](a: A, f: A => A) = {
     var cur = a
-    val change = eff delay { cur = f(cur) }
-    val readResult = eff delay cur
+    val change = eff.delay { cur = f(cur) }
+    val readResult = eff.delay { cur }
 
-    val double: F[Unit] = eff async { cb =>
+    val double: F[Unit] = eff.async { cb =>
       cb(Right(()))
       cb(Right(()))
     }
 
-    val test = eff.runAsync(double *> change) { _ => eff.unit }
-
-    test *> readResult <-> eff.point(f(a))
+    double *> change *> readResult <-> eff.delay(f(a))
   }
 
   /**

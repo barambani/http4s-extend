@@ -38,8 +38,7 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
           |        CompositeException(x, y, Nil)
           |    }
           |
-          |  def ioEff = Effectful[Throwable, IO]
-          |  def scalazTaskEff = Effectful[Throwable, ScalazTask]"""
+          |  def ioEff = Effectful[Throwable, IO]"""
 
       val staticBottom = static"""}"""
 
@@ -58,21 +57,24 @@ private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
             `sym e0..en-1` map (e => s"ioEff.fail[Int]($e)") mkString ", "
 
           lazy val `scalazTaskEff.fail[Int](e0)..scalazTaskEff.fail[Int](en-1)` =
-            `sym e0..en-1` map (e => s"scalazTaskEff.fail[Int]($e)") mkString ", "
+            `sym e0..en-1` map (e => s"ScalazTask.fail($e)") mkString ", "
 
           lazy val `(e1 combine e2) ... combine en-1` =
             leftAssociativeExpansionOf(`sym e0..en-1`)("")(" combine ")
 
+          lazy val `(_: Int, ... , _: Int)` =
+            `sym _, ... , _` map (s => s"$s: Int") mkString ("(", ", ", ")")
+
           static"""
             |  test("$arityS io errors are accumulated by parMap") {
             |    Prop.forAll { (${`e0: Throwable..en-1: Throwable`}) => {
-            |      (${`ioEff.fail[Int](e0)..ioEff.fail[Int](en-1)`}).parMap{ ${`(_, ... , _)`} => () } <-> ioEff.fail[Unit](${`(e1 combine e2) ... combine en-1`})
+            |      (${`ioEff.fail[Int](e0)..ioEff.fail[Int](en-1)`}).parMap { ${`(_, ... , _)`} => () } <-> ioEff.fail[Unit](${`(e1 combine e2) ... combine en-1`})
             |    }}
             |  }
             |
             |  test("$arityS scalaz task errors are accumulated by parMap") {
             |    Prop.forAll { (${`e0: Throwable..en-1: Throwable`}) => {
-            |      (${`scalazTaskEff.fail[Int](e0)..scalazTaskEff.fail[Int](en-1)`}).parMap{ ${`(_, ... , _)`} => () } <-> scalazTaskEff.fail[Unit](${`(e1 combine e2) ... combine en-1`})
+            |      (${`scalazTaskEff.fail[Int](e0)..scalazTaskEff.fail[Int](en-1)`}).parMap { ${`(_: Int, ... , _: Int)`} => () } <-> ScalazTask.fail(${`(e1 combine e2) ... combine en-1`}).map((_: Int) => ())
             |    }}
             |  }""".stripMargin
         }
