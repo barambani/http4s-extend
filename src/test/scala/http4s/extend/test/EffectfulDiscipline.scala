@@ -17,14 +17,12 @@ import http4s.extend.util.ThrowableInstances
 import http4s.extend.{Effectful, ExceptionDisplay, Void}
 import org.scalacheck.Arbitrary.arbDouble
 import org.scalacheck.{Arbitrary, Prop}
-import scalaz.concurrent.{Task => ScalazTask}
 
 final class EffectfulDiscipline extends MinimalSuite with ThrowableInstances {
 
   implicit val C = TestContext()
 
   effectfulDisciplineOf[IO]("IO")
-  effectfulDisciplineOf[ScalazTask]("Scalaz Task")
 
   private def effectfulDisciplineOf[F[_]](effectName: String)(
     implicit

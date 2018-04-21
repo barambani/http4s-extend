@@ -38,6 +38,7 @@ private[Templates] final case class BlockMembersExpansions(private val upToArity
   lazy val `sym a0..an-1`       = arityRange map (n => s"a$n")
   lazy val `sym F[A0]..F[An-1]` = arityRange map (n => s"F[A$n]")
   lazy val `sym _1.._n`         = arityRange map (n => s"_${n + 1}")
+  lazy val `sym _, ... , _`     = List.fill(upToArity)("_")
 
   lazy val `A0..An-1`       = `sym A0..An-1` mkString ", "
   lazy val `a0..an-1`       = `sym a0..an-1` mkString ", "
@@ -45,7 +46,7 @@ private[Templates] final case class BlockMembersExpansions(private val upToArity
   lazy val `F[A0]..F[An-1]` = `sym F[A0]..F[An-1]` mkString ", "
 
   lazy val `(_, ... , _)` =
-    List.fill(upToArity)("_") mkString ("(", ", ", ")")
+    `sym _, ... , _` mkString ("(", ", ", ")")
 
   lazy val `fa0: =>F[A0]..fan-1: =>F[An-1]` =
     `sym fa0..fan-1` zip `sym F[A0]..F[An-1]` map { case (fa, f) => s"$fa: =>$f" } mkString ", "

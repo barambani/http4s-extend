@@ -55,12 +55,10 @@ private[extend] sealed trait ByNameNtInstances {
       val evG = Functor[IO]
 
       def apply[A]: (=>ScalazTask[A]) => IO[A] =
-        fa => Eval.always(
-          fa.unsafePerformSyncAttempt.fold(
-            e => IO.raiseError(e),
-            a => IO.pure(a)
-          )
-        ).value
+        _.unsafePerformSyncAttempt.fold(
+          e => IO.raiseError(e),
+          a => IO.pure(a)
+        )
     }
 
   implicit def ioToScalazTask: IO ~~> ScalazTask =
