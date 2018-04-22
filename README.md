@@ -22,4 +22,4 @@ For its own purpose is integration, Http4s Extend will bring into a using projec
 
 |        | Http4s    | Monix     | Scalaz Concurrent |
 | ------ |:---------:|:---------:|:-----------------:|
-| 0.0.28 | 0.18.8    | 3.0.0-RC1 | 7.2.21            |
+| 0.0.28 | 0.18.9    | 3.0.0-RC1 | 7.2.21            |
