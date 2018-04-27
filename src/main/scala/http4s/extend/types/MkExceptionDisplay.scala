@@ -8,14 +8,17 @@ import http4s.extend.{ExceptionDisplay, Iso, NewType}
 object MkExceptionDisplay extends NewType with ExceptionDisplayCatsTypeclassInstances with ExceptionDisplayFunctions {
 
   def apply(b: String): T = b.asInstanceOf[T]
-  def unMk(t: T): String = t.asInstanceOf[String]
   def mkF[F[_]](fs: F[String]): F[T] = fs.asInstanceOf[F[T]]
+
+  implicit final class MkExceptionDisplaySyntax(val t: T) extends AnyVal {
+    def unMk: String = t.asInstanceOf[String]
+  }
 }
 
 private[types] sealed trait ExceptionDisplayCatsTypeclassInstances {
 
   implicit val exceptionDisplayEq: Eq[ExceptionDisplay] =
-    Eq.by[ExceptionDisplay, String](ExceptionDisplay.unMk)
+    Eq.by[ExceptionDisplay, String](_.unMk)
 
   implicit val isoThrowable: Iso[Throwable, ExceptionDisplay] =
     new Iso[Throwable, ExceptionDisplay] {
@@ -54,11 +57,11 @@ private[types] sealed trait ExceptionDisplayFunctions {
 
   def throwableOf: ExceptionDisplay => Throwable =
     xs => throwableHierarchy {
-      ExceptionDisplay.unMk(xs).split(separator).toSeq map ExceptionDisplay.apply
+      xs.unMk.split(separator).toSeq map ExceptionDisplay.apply
     }
 
   def throwableHierarchy: Seq[ExceptionDisplay] => Throwable =
-    xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(ExceptionDisplay.unMk(m), th) }
+    xs => xs.foldRight(null: Throwable){ (m, th) => new Throwable(m.unMk, th) }
 
   def fullDisplay: Throwable => ExceptionDisplay =
     th => ExceptionDisplay(s"${ flatMessages(th) mkString separator }")

@@ -6,8 +6,11 @@ import http4s.extend.{Iso, NewType, Void}
 
 object MkVoid extends NewType with VoidCatsTypeclassInstances {
   def apply(b: Unit): T = b.asInstanceOf[T]
-  def unMk(t: T): Unit = t.asInstanceOf[Unit]
   def mkF[F[_]](fs: F[Unit]): F[T] = fs.asInstanceOf[F[T]]
+
+  implicit final class MkVoidSyntax(val t: T) extends AnyVal {
+    def unMk(): Unit = t.asInstanceOf[Unit]
+  }
 }
 
 private[types] sealed trait VoidCatsTypeclassInstances extends VoidScalazTypeclassInstances {

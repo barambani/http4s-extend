@@ -5,8 +5,11 @@ import scalaz.{Monoid, Semigroup}
 
 object MkAndBoolean extends NewType with AndBooleanInstances {
   def apply(b: Boolean): T = b.asInstanceOf[T]
-  def unMk(t: T): Boolean = t.asInstanceOf[Boolean]
   def mkF[F[_]](fs: F[Boolean]): F[T] = fs.asInstanceOf[F[T]]
+
+  implicit final class MkAndBooleanSyntax(val t: T) extends AnyVal {
+    def unMk: Boolean = t.asInstanceOf[Boolean]
+  }
 }
 
 private[types] sealed trait AndBooleanInstances extends AndBooleanSyntax {
@@ -33,5 +36,5 @@ private[types] final class AndBooleanOps(val x: AndBoolean) extends AnyVal {
     * AND operator between `x` and `y` that uses the internal boolean value
     */
   def =&&=(y: AndBoolean): AndBoolean =
-    AndBoolean(AndBoolean.unMk(x) && AndBoolean.unMk(y))
+    AndBoolean(x.unMk && y.unMk)
 }

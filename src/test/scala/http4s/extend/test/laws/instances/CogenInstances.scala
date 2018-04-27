@@ -13,8 +13,8 @@ private[test] trait CogenInstances {
     Cogen[Future[A]] { (seed: Seed, t: Future[A]) => Cogen[A].perturb(seed, Await.result(t, 1.second)) }
 
   implicit def exceptionDisplayCogen(implicit ev: Cogen[String]): Cogen[ExceptionDisplay] =
-    ev contramap ExceptionDisplay.unMk
+    ev contramap (_.unMk)
 
   implicit def voidCogen(implicit ev: Cogen[Unit]): Cogen[Void] =
-    ev contramap Void.unMk
+    ev contramap (_.unMk)
 }
