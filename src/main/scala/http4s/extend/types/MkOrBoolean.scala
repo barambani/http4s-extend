@@ -5,8 +5,11 @@ import scalaz.{Monoid, Semigroup}
 
 object MkOrBoolean extends NewType with OrBooleanInstances {
   def apply(b: Boolean): T = b.asInstanceOf[T]
-  def unMk(t: T): Boolean = t.asInstanceOf[Boolean]
   def mkF[F[_]](fs: F[Boolean]): F[T] = fs.asInstanceOf[F[T]]
+
+  implicit final class MkOrBooleanSyntax(val t: T) extends AnyVal {
+    def unMk: Boolean = t.asInstanceOf[Boolean]
+  }
 }
 
 private[types] sealed trait OrBooleanInstances extends OrBooleanSyntax {
@@ -33,5 +36,5 @@ private[types] final class OrBooleanOps(val x: OrBoolean) extends AnyVal {
     * OR operator between `x` and `y` that uses the internal boolean value
     */
   def =||=(y: OrBoolean): OrBoolean =
-    OrBoolean.apply(OrBoolean.unMk(x) && OrBoolean.unMk(y))
+    OrBoolean.apply(x.unMk && y.unMk)
 }
