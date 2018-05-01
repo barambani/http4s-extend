@@ -50,9 +50,10 @@ private[extend] sealed trait ParEffectfulInstances {
 private[extend] sealed trait ParEffectfulFunctions {
 
   /**
-    * Traverse derived from ParEffectful parMap2. If used with IO in F[_] position it will
-    * wait for all the effectful computations to complete and will aggregate all the eventual
-    * errors in a CompositeException. See here for possible usage
+    * Traverse derived from ParEffectful parMap2. If used with IO in `F[_]` position (summoning
+    * the ioEffectfulOp) it will wait for all the effectful computations to complete and
+    * will aggregate all the eventual errors through the `Semigroup[Throwable]` provided.
+    * See here for possible usage
     *
     * https://github.com/barambani/http4s-poc-api/blob/master/src/main/scala/service/ProductRepo.scala#L33
     */
