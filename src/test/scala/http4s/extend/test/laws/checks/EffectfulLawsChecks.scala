@@ -28,6 +28,7 @@ private[test] sealed trait EffectfulLawsChecks[E, F[_]] extends Laws {
       def parents: Seq[RuleSet] = Nil
 
       val props = Seq(
+        "flatMap not progress on fail"            -> forAll(laws.flatMapNotProgressOnFail[A] _),
         "runAsync pure produces right IO"         -> forAll(laws.runAsyncPureProducesRightIO[A] _),
         "runAsync raiseError produces left IO"    -> forAll(laws.runAsyncRaiseErrorProducesLeftIO[A] _),
         "runAsync ignores error in handler"       -> forAll(laws.runAsyncIgnoresErrorInHandler[A] _),

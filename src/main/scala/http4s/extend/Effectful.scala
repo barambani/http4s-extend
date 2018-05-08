@@ -1,19 +1,22 @@
 package http4s.extend
 
+import cats.Monad
 import cats.effect.IO
 import cats.syntax.either._
 
 import scala.util.Either
 
 /**
-  * Describes the capability of producing effects. The error is explicit and can be any.
-  * An instance for cats.effect.IO and Throwable is provided. It's possible to obtain an instance
-  * for any other error `E` providing a valid instance of `Iso[Throwable, E]`.
+  * Describes the capability of producing effects. The error is explicit and can be of any type.
+  * An instance for cats.effect.IO is provided from which is possible to obtain an instance
+  * for any error `E` when there is evidence of an `Iso[Throwable, E]`.
   *
-  * Notice that there's no need to provide an `Iso[Throwable, Throwable]` ad it's automatically
-  * put in scope by `Iso`, so an instance of `Effectful[Throwable, IO]` will be always available.
+  * Notice that there's no need to provide an `Iso[Throwable, Throwable]` to have an `Effectful[Throwable, IO]`
+  * as such is already put in the implicit scope by `Iso`.
   */
 trait Effectful[E, F[_]] {
+
+  def M: Monad[F]
 
   def unit: F[Unit]
 
@@ -38,6 +41,8 @@ private[extend] sealed trait EffectfulInstances {
 
   implicit def ioEffectful[E](implicit iso: Iso[Throwable, E]): Effectful[E, IO] =
     new Effectful[E, IO] {
+
+      val M = Monad[IO]
 
       def unit: IO[Unit] = IO.unit
 
