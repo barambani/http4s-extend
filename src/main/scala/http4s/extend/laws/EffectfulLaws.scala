@@ -1,6 +1,6 @@
 package http4s.extend.laws
 
-import cats.MonadError
+import cats.Monad
 import cats.laws._
 import cats.syntax.apply._
 import cats.syntax.either._
@@ -14,14 +14,14 @@ import http4s.extend.Effectful
   */
 sealed trait EffectfulLaws[E, F[_]] {
 
+  implicit def F: Monad[F]
   implicit def eff: Effectful[E, F]
-  implicit def monadError: MonadError[F, E]
 
   /**
     * Laws from cats.effect Effect[F]
     */
   def runAsyncPureProducesRightIO[A](a: A) = {
-    val fa = monadError.pure(a)
+    val fa = eff.point(a)
     var result: Option[Either[E, A]] = None
     val read = eff delay { result.get }
 
@@ -29,7 +29,7 @@ sealed trait EffectfulLaws[E, F[_]] {
   }
 
   def runAsyncRaiseErrorProducesLeftIO[A](e: E) = {
-    val fa: F[A] = monadError.raiseError(e)
+    val fa: F[A] = eff.fail[A](e)
     var result: Option[Either[E, A]] = None
     val read = eff delay { result.get }
 
@@ -37,8 +37,8 @@ sealed trait EffectfulLaws[E, F[_]] {
   }
 
   def runAsyncIgnoresErrorInHandler[A](e: E) = {
-    val fa = monadError.pure(())
-    eff.runAsync(fa)(_ => monadError.raiseError(e)) <-> eff.point(())
+    val fa = eff.point(())
+    eff.runAsync(fa)(_ => eff.fail[Unit](e)) <-> eff.point(())
   }
 
   def repeatedCallbackIgnored[A](a: A, f: A => A) = {
@@ -58,10 +58,10 @@ sealed trait EffectfulLaws[E, F[_]] {
     * Laws from cats.effect Async[F]
     */
   def asyncRightIsPure[A](a: A) =
-    eff.async[A](_(Right(a))) <-> monadError.pure(a)
+    eff.async[A](_(Right(a))) <-> eff.point(a)
 
   def asyncLeftIsRaiseError[A](e: E) =
-    eff.async[A](_(Left(e))) <-> monadError.raiseError(e)
+    eff.async[A](_(Left(e))) <-> eff.fail[A](e)
 
   def repeatedAsyncEvaluationNotMemoized[A](a: A, f: A => A) = {
     var cur = a
@@ -73,33 +73,30 @@ sealed trait EffectfulLaws[E, F[_]] {
 
     val read: F[A] = eff.delay(cur)
 
-    change *> change *> read <-> monadError.pure(f(f(a)))
+    change *> change *> read <-> eff.point(f(f(a)))
   }
 
   def propagateErrorsThroughBindAsync[A](t: E) = {
-    val fa = monadError.attempt(monadError.flatMap(eff.async[A](_ (Left(t))))(x => monadError.pure(x)))
+    val fa = eff.attempt(F.flatMap(eff.async[A](_ (Left(t))))(x => eff.point(x)))
 
-    fa <-> monadError.pure(Left(t))
+    fa <-> eff.point[Either[E, A]](Left(t))
   }
 
   /**
     * Laws from cats.effect Sync[F]
     */
   def delayConstantIsPure[A](a: A) =
-    eff.delay(a) <-> monadError.pure(a)
+    eff.delay(a) <-> eff.point(a)
 
   def suspendConstantIsPureJoin[A](fa: F[A]) =
-    eff.suspend(fa) <-> monadError.flatten(monadError.pure(fa))
-
-  def failIsRaiseError[A](e: E) =
-    eff.fail(e) <-> monadError.raiseError(e)
+    eff.suspend(fa) <-> F.flatten(eff.point(fa))
 
   def unsequencedDelayIsNoop[A](a: A, f: A => A) = {
     var cur = a
     val change = eff delay { cur = f(cur) }
     val _ = change
 
-    eff.delay(cur) <-> monadError.pure(a)
+    eff.delay(cur) <-> eff.point(a)
   }
 
   def repeatedSyncEvaluationNotMemoized[A](a: A, f: A => A) = {
@@ -107,69 +104,69 @@ sealed trait EffectfulLaws[E, F[_]] {
     val change = eff delay { cur = f(cur) }
     val read = eff.delay(cur)
 
-    change *> change *> read <-> monadError.pure(f(f(a)))
+    change *> change *> read <-> eff.point(f(f(a)))
   }
 
   def bindSuspendsEvaluation[A](fa: F[A], a1: A, f: (A, A) => A) = {
     var state = a1
-    val evolve = monadError.flatMap(fa) { a2 =>
+    val evolve = F.flatMap(fa) { a2 =>
       state = f(state, a2)
-      monadError.pure(state)
+      eff.point(state)
     }
     // Observing `state` before and after `evolve`
-    monadError.map2(monadError.pure(state), evolve)(f) <-> monadError.map(fa)(a2 => f(a1, f(a1, a2)))
+    F.map2(eff.point(state), evolve)(f) <-> F.map(fa)(a2 => f(a1, f(a1, a2)))
   }
 
   def mapSuspendsEvaluation[A](fa: F[A], a1: A, f: (A, A) => A) = {
     var state = a1
-    val evolve = monadError.map(fa) { a2 =>
+    val evolve = F.map(fa) { a2 =>
       state = f(state, a2)
       state
     }
     // Observing `state` before and after `evolve`
-    monadError.map2(monadError.pure(state), evolve)(f) <-> monadError.map(fa)(a2 => f(a1, f(a1, a2)))
+    F.map2(eff.point(state), evolve)(f) <-> F.map(fa)(a2 => f(a1, f(a1, a2)))
   }
 
   def stackSafetyOnRepeatedLeftBinds = {
     val result = (0 until 10000).foldLeft(eff.delay(())) { (acc, _) =>
-      monadError.flatMap(acc)(_ => eff.delay(()))
+      F.flatMap(acc)(_ => eff.delay(()))
     }
 
-    result <-> monadError.pure(())
+    result <-> eff.point(())
   }
 
   def stackSafetyOnRepeatedRightBinds = {
     val result = (0 until 10000).foldRight(eff.delay(())) { (_, acc) =>
-      monadError.flatMap(eff.delay(()))(_ => acc)
+      F.flatMap(eff.delay(()))(_ => acc)
     }
 
-    result <-> monadError.pure(())
+    result <-> eff.point(())
   }
 
   def stackSafetyOnRepeatedAttempts = {
     // Note this isn't enough to guarantee stack safety, unless
     // coupled with `bindSuspendsEvaluation`
     val result = (0 until 10000).foldLeft(eff.delay(())) { (acc, _) =>
-      monadError.map(monadError.attempt(acc))(_ => ())
+      F.map(eff.attempt(acc))(_ => ())
     }
-    result <-> monadError.pure(())
+    result <-> eff.point(())
   }
 
   def stackSafetyOnRepeatedMaps = {
     // Note this isn't enough to guarantee stack safety, unless
     // coupled with `mapSuspendsEvaluation`
     val result = (0 until 10000).foldLeft(eff.delay(0)) { (acc, _) =>
-      monadError.map(acc)(_ + 1)
+      F.map(acc)(_ + 1)
     }
-    result <-> monadError.pure(10000)
+    result <-> eff.point(10000)
   }
 }
 
 object EffectfulLaws {
 
-  @inline def apply[E, F[_]](implicit ev1: Effectful[E, F], ev2: MonadError[F, E]): EffectfulLaws[E, F] =
+  @inline def apply[E, F[_]](implicit ev1: Monad[F], ev2: Effectful[E, F]): EffectfulLaws[E, F] =
     new EffectfulLaws[E, F] {
-      def eff: Effectful[E, F] = ev1
-      def monadError: MonadError[F, E] = ev2
+      def F: Monad[F] = ev1
+      def eff: Effectful[E, F] = ev2
     }
 }
