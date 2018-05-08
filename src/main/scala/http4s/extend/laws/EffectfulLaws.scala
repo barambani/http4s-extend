@@ -7,15 +7,21 @@ import cats.syntax.either._
 import http4s.extend.Effectful
 
 /**
-  * Effectful, together with its MonadError evidence, should abide by the same laws as cats.effect.Effect
+  * Effectful of `F[_]`, when there is evidence of a Monad for `F[_]`, should abide by the same laws as cats.effect.Effect
   * 
-  * The code below is adapted from the Cats Effect Laws:
+  * The code below is adapted from the Cats Effect Laws to prove that the abstractions give the same guarantees:
   * https://github.com/typelevel/cats-effect/tree/master/laws/shared/src/main/scala/cats/effect/laws
   */
 sealed trait EffectfulLaws[E, F[_]] {
 
-  implicit def F: Monad[F]
+  implicit val evidence: Monad[F] = eff.M
   implicit def eff: Effectful[E, F]
+
+  /**
+    * Laws for Effectful and its Monad
+    */
+  def flatMapNotProgressOnFail[A](e: E, f: A => F[A]) =
+    eff.M.flatMap(eff.fail[A](e))(f) <-> eff.fail[A](e)
 
   /**
     * Laws from cats.effect Effect[F]
@@ -77,7 +83,7 @@ sealed trait EffectfulLaws[E, F[_]] {
   }
 
   def propagateErrorsThroughBindAsync[A](t: E) = {
-    val fa = eff.attempt(F.flatMap(eff.async[A](_ (Left(t))))(x => eff.point(x)))
+    val fa = eff.attempt(eff.M.flatMap(eff.async[A](_ (Left(t))))(x => eff.point(x)))
 
     fa <-> eff.point[Either[E, A]](Left(t))
   }
@@ -89,7 +95,7 @@ sealed trait EffectfulLaws[E, F[_]] {
     eff.delay(a) <-> eff.point(a)
 
   def suspendConstantIsPureJoin[A](fa: F[A]) =
-    eff.suspend(fa) <-> F.flatten(eff.point(fa))
+    eff.suspend(fa) <-> eff.M.flatten(eff.point(fa))
 
   def unsequencedDelayIsNoop[A](a: A, f: A => A) = {
     var cur = a
@@ -109,27 +115,27 @@ sealed trait EffectfulLaws[E, F[_]] {
 
   def bindSuspendsEvaluation[A](fa: F[A], a1: A, f: (A, A) => A) = {
     var state = a1
-    val evolve = F.flatMap(fa) { a2 =>
+    val evolve = eff.M.flatMap(fa) { a2 =>
       state = f(state, a2)
       eff.point(state)
     }
     // Observing `state` before and after `evolve`
-    F.map2(eff.point(state), evolve)(f) <-> F.map(fa)(a2 => f(a1, f(a1, a2)))
+    eff.M.map2(eff.point(state), evolve)(f) <-> eff.M.map(fa)(a2 => f(a1, f(a1, a2)))
   }
 
   def mapSuspendsEvaluation[A](fa: F[A], a1: A, f: (A, A) => A) = {
     var state = a1
-    val evolve = F.map(fa) { a2 =>
+    val evolve = eff.M.map(fa) { a2 =>
       state = f(state, a2)
       state
     }
     // Observing `state` before and after `evolve`
-    F.map2(eff.point(state), evolve)(f) <-> F.map(fa)(a2 => f(a1, f(a1, a2)))
+    eff.M.map2(eff.point(state), evolve)(f) <-> eff.M.map(fa)(a2 => f(a1, f(a1, a2)))
   }
 
   def stackSafetyOnRepeatedLeftBinds = {
     val result = (0 until 10000).foldLeft(eff.delay(())) { (acc, _) =>
-      F.flatMap(acc)(_ => eff.delay(()))
+      eff.M.flatMap(acc)(_ => eff.delay(()))
     }
 
     result <-> eff.point(())
@@ -137,7 +143,7 @@ sealed trait EffectfulLaws[E, F[_]] {
 
   def stackSafetyOnRepeatedRightBinds = {
     val result = (0 until 10000).foldRight(eff.delay(())) { (_, acc) =>
-      F.flatMap(eff.delay(()))(_ => acc)
+      eff.M.flatMap(eff.delay(()))(_ => acc)
     }
 
     result <-> eff.point(())
@@ -147,7 +153,7 @@ sealed trait EffectfulLaws[E, F[_]] {
     // Note this isn't enough to guarantee stack safety, unless
     // coupled with `bindSuspendsEvaluation`
     val result = (0 until 10000).foldLeft(eff.delay(())) { (acc, _) =>
-      F.map(eff.attempt(acc))(_ => ())
+      eff.M.map(eff.attempt(acc))(_ => ())
     }
     result <-> eff.point(())
   }
@@ -156,7 +162,7 @@ sealed trait EffectfulLaws[E, F[_]] {
     // Note this isn't enough to guarantee stack safety, unless
     // coupled with `mapSuspendsEvaluation`
     val result = (0 until 10000).foldLeft(eff.delay(0)) { (acc, _) =>
-      F.map(acc)(_ + 1)
+      eff.M.map(acc)(_ + 1)
     }
     result <-> eff.point(10000)
   }
@@ -164,9 +170,8 @@ sealed trait EffectfulLaws[E, F[_]] {
 
 object EffectfulLaws {
 
-  @inline def apply[E, F[_]](implicit ev1: Monad[F], ev2: Effectful[E, F]): EffectfulLaws[E, F] =
+  @inline def apply[E, F[_]](implicit ev: Effectful[E, F]): EffectfulLaws[E, F] =
     new EffectfulLaws[E, F] {
-      def F: Monad[F] = ev1
-      def eff: Effectful[E, F] = ev2
+      def eff: Effectful[E, F] = ev
     }
 }
