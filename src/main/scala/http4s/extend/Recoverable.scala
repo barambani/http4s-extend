@@ -45,7 +45,7 @@ private[extend] sealed trait RecoverableInstances {
 
       def recoverWith[A]: IO[A] => (E => NonFailingIO[A]) => NonFailingIO[A] =
         io => f => NonFailingIO.fromIo(
-          io.attempt.flatMap {
+          io.attempt flatMap {
             _.fold(f compose iso.to, NonFailingIO.fromA).absolved()
           }
         )
