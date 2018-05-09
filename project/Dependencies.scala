@@ -13,6 +13,7 @@ object Dependencies {
     val catsEffectLaws  = "1.0.0-RC"
 
     val kindProjector = "0.9.6"
+    val splain        = "0.3.1"
   }
 
   val externalDependencies: Seq[ModuleID] = Seq(
@@ -34,6 +35,6 @@ object Dependencies {
 
   val compilerPlugins: Seq[ModuleID] = Seq(
     compilerPlugin("org.spire-math" %% "kind-projector" % versionOf.kindProjector cross CrossVersion.binary),
-    compilerPlugin("io.tryp"        %   "splain"        % "0.2.9"                 cross CrossVersion.patch)
+    compilerPlugin("io.tryp"        %   "splain"        % versionOf.splain        cross CrossVersion.patch)
   )
 }
