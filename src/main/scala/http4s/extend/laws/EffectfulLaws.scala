@@ -21,7 +21,7 @@ sealed trait EffectfulLaws[E, F[_]] {
     * Laws for Effectful and its Monad
     */
   def flatMapNotProgressOnFail[A](e: E, f: A => F[A]) =
-    eff.M.flatMap(eff.fail[A](e))(f) <-> eff.fail[A](e)
+    eff.M.flatMap(eff.fail(e))(f) <-> eff.fail[A](e)
 
   /**
     * Laws from cats.effect Effect[F]
@@ -83,9 +83,9 @@ sealed trait EffectfulLaws[E, F[_]] {
   }
 
   def propagateErrorsThroughBindAsync[A](t: E) = {
-    val fa = eff.attempt(eff.M.flatMap(eff.async[A](_ (Left(t))))(x => eff.point(x)))
+    val fa = eff.M.flatMap(eff.async[A](_ (Left(t))))(x => eff.point(x))
 
-    fa <-> eff.point[Either[E, A]](Left(t))
+    fa <-> eff.fail[A](t)
   }
 
   /**
@@ -146,15 +146,6 @@ sealed trait EffectfulLaws[E, F[_]] {
       eff.M.flatMap(eff.delay(()))(_ => acc)
     }
 
-    result <-> eff.point(())
-  }
-
-  def stackSafetyOnRepeatedAttempts = {
-    // Note this isn't enough to guarantee stack safety, unless
-    // coupled with `bindSuspendsEvaluation`
-    val result = (0 until 10000).foldLeft(eff.delay(())) { (acc, _) =>
-      eff.M.map(eff.attempt(acc))(_ => ())
-    }
     result <-> eff.point(())
   }
 

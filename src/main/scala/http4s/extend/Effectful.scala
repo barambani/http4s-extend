@@ -28,10 +28,6 @@ trait Effectful[E, F[_]] {
 
   def suspend[A]: (=>F[A]) => F[A]
 
-  def attempt[A]: F[A] => F[Either[E, A]]
-
-  def absolve[A]: F[Either[E, A]] => F[A]
-
   def async[A]: ((Either[E, A] => Unit) => Unit) => F[A]
 
   def runAsync[A]: F[A] => (Either[E, A] => F[Unit]) => F[Unit]
@@ -39,10 +35,10 @@ trait Effectful[E, F[_]] {
 
 private[extend] sealed trait EffectfulInstances {
 
-  implicit def ioEffectful[E](implicit iso: Iso[Throwable, E]): Effectful[E, IO] =
+  implicit def ioEffectful[E](implicit iso: Iso[Throwable, E], ev: Monad[IO]): Effectful[E, IO] =
     new Effectful[E, IO] {
 
-      val M = Monad[IO]
+      val M = ev
 
       def unit: IO[Unit] = IO.unit
 
@@ -55,12 +51,6 @@ private[extend] sealed trait EffectfulInstances {
 
       def suspend[A]: (=>IO[A]) => IO[A] =
         IO.suspend
-
-      def attempt[A]: IO[A] => IO[Either[E, A]] =
-        _.attempt map (_ leftMap iso.to)
-
-      def absolve[A]: IO[Either[E, A]] => IO[A] =
-        _ flatMap { _.fold(IO.raiseError _ compose iso.from, IO.pure) }
 
       def async[A]: ((Either[E, A] => Unit) => Unit) => IO[A] =
         asyncAction => IO.async {
