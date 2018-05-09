@@ -45,7 +45,6 @@ private[test] sealed trait EffectfulLawsChecks[E, F[_]] extends Laws {
         "map suspends evaluation"                 -> forAll(laws.mapSuspendsEvaluation[A] _),
         "stack-safe on left-associated binds"     -> Prop.lzy(laws.stackSafetyOnRepeatedLeftBinds),
         "stack-safe on right-associated binds"    -> Prop.lzy(laws.stackSafetyOnRepeatedRightBinds),
-        "stack-safe on repeated attempts"         -> Prop.lzy(laws.stackSafetyOnRepeatedAttempts),
         "stack-safe on repeated maps"             -> Prop.lzy(laws.stackSafetyOnRepeatedMaps)
       )
     }

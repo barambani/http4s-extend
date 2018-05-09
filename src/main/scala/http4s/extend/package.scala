@@ -4,6 +4,8 @@ import http4s.extend.types.{MkAndBoolean, MkExceptionDisplay, MkOrBoolean, MkVoi
 
 package object extend {
 
+  type |[A, B] = Either[A, B]
+
   type ~~>[F[_], G[_]] = ByNameNt.~~>[F, G]
 
   val ExceptionDisplay = MkExceptionDisplay
