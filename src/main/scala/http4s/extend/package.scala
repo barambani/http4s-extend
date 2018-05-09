@@ -1,6 +1,6 @@
 package http4s
 
-import http4s.extend.types.{MkAndBoolean, MkExceptionDisplay, MkOrBoolean, MkVoid}
+import http4s.extend.types._
 
 package object extend {
 
@@ -19,4 +19,7 @@ package object extend {
 
   val OrBoolean = MkOrBoolean
   type OrBoolean = OrBoolean.T
+
+  val NonFailingIO = MkNonFailingIO
+  type NonFailingIO[A] = NonFailingIO.T[A]
 }
