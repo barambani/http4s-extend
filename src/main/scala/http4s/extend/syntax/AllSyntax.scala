@@ -8,3 +8,4 @@ trait AllSyntax
   with    ResponseVerificationSyntax
   with    EqSyntax
   with    ParEffectfulSyntax
+  with    ErrorResponseSyntax
