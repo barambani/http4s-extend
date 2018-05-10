@@ -7,7 +7,7 @@ private[syntax] trait ParEffectfulSyntax extends ParEffectfulAritySyntax {
   implicit def parEffectfulTraverseSyntax[T[_] : Traverse : Applicative, A](t: T[A]) = new TraverseParEffectfulOps(t)
 }
 
-private[syntax] final class TraverseParEffectfulOps[T[_], A](t: T[A]) {
+private[syntax] final class TraverseParEffectfulOps[T[_], A](val t: T[A]) extends AnyVal {
   def parTraverse[F[_] : ParEffectful : Applicative, B](f: A => F[B])(
     implicit
       ev1: Monoid[T[B]],

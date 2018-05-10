@@ -14,4 +14,5 @@ package object syntax {
   object httpService          extends Http4sServiceSyntax
   object responseVerification extends ResponseVerificationSyntax
   object parEffectful         extends ParEffectfulSyntax
+  object errorResponse        extends ErrorResponseSyntax
 }
