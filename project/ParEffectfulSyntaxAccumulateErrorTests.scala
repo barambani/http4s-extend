@@ -3,7 +3,7 @@ package Templates
 import Templates.BlockSyntax._
 import sbt._
 
-private[Templates] object ParEffectfulAritySyntaxTest1 extends Template {
+private[Templates] object ParEffectfulSyntaxAccumulateErrorTests extends Template {
 
   def moduleFile: File => File =
     _ / "syntax" / "ParEffectfulSyntaxAccumulateErrorTests.scala"

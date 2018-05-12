@@ -13,7 +13,7 @@ trait RecoverableLaws[E, F[_], G[_]] {
   def flatMapNeverStopsForG[A](ga: G[A], f: E => A) =
     (re.recover[A] compose re.toFallible[A])(ga)(f) <-> ga
 
-  def absolveAttempt[A](fa: F[A]) =
+  def absolveAttemptNotChangingFa[A](fa: F[A]) =
     (re.absolve[A] compose re.attempt[A])(fa) <-> fa
 }
 
