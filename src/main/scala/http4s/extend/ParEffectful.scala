@@ -10,7 +10,8 @@ import scala.concurrent.ExecutionContext
 
 /**
   * ParEffectful describes the execution of F[_] in parallel.
-  * The IO instance is implemented in terms of fs2 async.start
+  * The IO instance is implemented using fiber and waits for
+  * both the computations to complete
   */
 trait ParEffectful[F[_]] {
   def parMap2[A, B, R](fa: =>F[A], fb: =>F[B])(f: (A, B) => R): F[R]
@@ -24,17 +25,16 @@ private[extend] sealed trait ParEffectfulInstances {
       val evidence = Effect[IO]
 
       def parMap2[A, B, R](fa: =>IO[A], fb: =>IO[B])(f: (A, B) => R): IO[R] =
-        (fs2.async.start(fa), fs2.async.start(fb)) mapN {
-          (ioa, iob) =>
-            evidence.rethrow(
-              (ioa.attempt, iob.attempt) mapN {
-                case (Right(a), Right(b)) => f(a, b).asRight
-                case (Left(ea), Left(eb)) => ev.combine(ea, eb).asLeft
-                case (Left(ea), _)        => ea.asLeft
-                case (_, Left(eb))        => eb.asLeft
-              }
-            )
-        } flatMap identity
+        (for {
+          fibA <- (IO.shift *> fa).start
+          fibB <- (IO.shift *> fb).start
+        } yield
+          (fibA.join.attempt, fibB.join.attempt) mapN {
+            case (Right(a), Right(b)) => f(a, b).asRight
+            case (Left(ea), Left(eb)) => ev.combine(ea, eb).asLeft
+            case (Left(ea), _)        => ea.asLeft
+            case (_, Left(eb))        => eb.asLeft
+          }) flatMap evidence.rethrow
     }
 
   implicit def scalazTaskEffectfulOp(implicit ev: ParEffectful[IO]): ParEffectful[ScalazTask] =

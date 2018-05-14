@@ -5,9 +5,9 @@ import http4s.extend.ByNameNt.~~>
 
 private[syntax] trait ByNameNtSyntax {
 
-  implicit def byNameNtSyntax[F[_], A](fa: =>F[A]) = new ByNameNtOps(fa)
+  implicit def byNameNtSyntax[F[_], A](fa: =>F[A]): ByNameNtOps[F, A] = new ByNameNtOps(fa)
 
-  implicit def byNameEitherNtSyntax[F[_], A, E](fa: =>F[Either[E, A]]) = new ByNameEitherNtOps(fa)
+  implicit def byNameEitherNtSyntax[F[_], A, E](fa: =>F[Either[E, A]]): ByNameEitherNtOps[F, A, E] = new ByNameEitherNtOps(fa)
 }
 
 private[syntax] final class ByNameNtOps[F[_], A](fa: =>F[A]) {

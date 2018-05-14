@@ -4,7 +4,7 @@ import http4s.extend.util.CirceModule._
 import io.circe.Decoder
 
 private[syntax] trait CirceSyntax {
-  implicit def circeDecoderSyntax[A](f: String => A) = new StringDecodingOps(f)
+  implicit def circeDecoderSyntax[A](f: String => A): StringDecodingOps[A] = new StringDecodingOps(f)
 }
 
 private[syntax] final class StringDecodingOps[A](val f: String => A) extends AnyVal {

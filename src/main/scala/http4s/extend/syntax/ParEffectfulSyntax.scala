@@ -4,7 +4,7 @@ import cats.{Applicative, Monoid, Traverse}
 import http4s.extend.ParEffectful
 
 private[syntax] trait ParEffectfulSyntax extends ParEffectfulAritySyntax {
-  implicit def parEffectfulTraverseSyntax[T[_] : Traverse : Applicative, A](t: T[A]) = new TraverseParEffectfulOps(t)
+  implicit def parEffectfulTraverseSyntax[T[_] : Traverse : Applicative, A](t: T[A]): TraverseParEffectfulOps[T, A] = new TraverseParEffectfulOps(t)
 }
 
 private[syntax] final class TraverseParEffectfulOps[T[_], A](val t: T[A]) extends AnyVal {
