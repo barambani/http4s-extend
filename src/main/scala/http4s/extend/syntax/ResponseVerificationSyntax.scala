@@ -15,8 +15,8 @@ import scala.util.Right
 
 private[syntax] trait ResponseVerificationSyntax {
 
-  implicit def verifiedSyntax[A](a: A) = new VerifiedOps(a)
-  implicit def verifiedOptionSyntax[A](a: Option[A]) = new VerifiedOptionOps(a)
+  implicit def verifiedSyntax[A](a: A): VerifiedOps[A] = new VerifiedOps(a)
+  implicit def verifiedOptionSyntax[A](a: Option[A]): VerifiedOptionOps[A] = new VerifiedOptionOps(a)
 
   implicit def responseVerificationSyntax(response: IO[Response[IO]]) =
     new IoResponseResultOps(response)

@@ -4,7 +4,7 @@ import http4s.extend.ErrorResponse
 import org.http4s.Response
 
 private[syntax] trait ErrorResponseSyntax {
-  implicit def errorResponseSyntax[E](e: E) = new ErrorResponseOps(e)
+  implicit def errorResponseSyntax[E](e: E): ErrorResponseOps[E] = new ErrorResponseOps(e)
 }
 
 private[syntax] final class ErrorResponseOps[E](val e: E) extends AnyVal {
