@@ -35,10 +35,7 @@ val releaseSettings: Seq[Def.Setting[_]] = Seq(
   pomIncludeRepository          := { _ => false },
   licenses                      := Seq("MIT License" -> url("https://raw.githubusercontent.com/barambani/http4s-extend/master/LICENSE")),
   homepage                      := Some(url("https://github.com/barambani/http4s-extend")),
-  publishTo                     := {
-    if (isSnapshot.value) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
-    else                  Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
-  },
+  publishTo                     := sonatypePublishTo.value,
   pomExtra :=
     <scm>
       <url>https://github.com/barambani/http4s-extend</url>
