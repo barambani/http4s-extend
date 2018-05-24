@@ -15,7 +15,7 @@ private[syntax] final class ByNameNtOps[F[_], A](fa: =>F[A]) {
   def ~~>[G[_] : F ~~> ?[_]]: G[A] = transformTo
 }
 
-private[syntax] final class ByNameEitherNtOps[F[_], A, E](val fa: F[Either[E, A]]) extends AnyVal {
+private[syntax] class ByNameEitherNtOps[F[_], A, E](val fa: F[Either[E, A]]) extends AnyVal {
   def liftIntoMonadError[G[_]](implicit nt: F ~~> G, err: MonadError[G, E]): G[A] =
     (err.rethrow[A] _ compose nt.apply)(fa)
 }

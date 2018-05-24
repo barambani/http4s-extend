@@ -7,7 +7,7 @@ private[syntax] trait CirceSyntax {
   implicit def circeDecoderSyntax[A](f: String => A): StringDecodingOps[A] = new StringDecodingOps(f)
 }
 
-private[syntax] final class StringDecodingOps[A](val f: String => A) extends AnyVal {
+private[syntax] class StringDecodingOps[A](val f: String => A) extends AnyVal {
   def decoder: Decoder[A] = decoderFor(f)
   def decoderMap[B](g: A => B): Decoder[B] = mappedDecoderFor(f)(g)
 }
