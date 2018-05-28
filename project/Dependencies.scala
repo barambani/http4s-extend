@@ -12,7 +12,7 @@ object Dependencies {
     val scalaCheck      = "1.13.5"
     val catsEffectLaws  = "1.0.0-RC"
 
-    val kindProjector = "0.9.6"
+    val kindProjector = "0.9.7"
     val splain        = "0.3.1"
   }
 
