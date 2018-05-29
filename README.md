@@ -13,7 +13,7 @@ A basic, still descriptive, example that demonstrates some possible uses for Htt
 ### Using Http4s Extend
 Http4s Extend is available for Scala `2.11.x` and `2.12.x`. To use it create the dependency by adding the following to the sbt build
 ```scala
-libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.37"
+libraryDependencies += "com.github.barambani" %% "http4s-extend" % "0.0.38"
 ```
 a sample configuration can be found [here](https://github.com/barambani/http4s-poc-api/blob/master/build.sbt) where the dependencies are taken from [here](https://github.com/barambani/http4s-poc-api/blob/master/project/Dependencies.scala)
 
@@ -22,7 +22,7 @@ For its own purpose is integration, Http4s Extend will bring into a using projec
 
 |        | Http4s    | Monix     | Scalaz Concurrent |
 | ------ |:---------:|:---------:|:-----------------:|
-| 0.0.37 | 0.18.11   | 3.0.0-RC1 | 7.2.23            |
+| 0.0.38 | 0.18.12   | 3.0.0-RC1 | 7.2.23            |
 
 ### New Type
 The `NewType` trait is a building block to help create zero allocation new types like
@@ -39,7 +39,7 @@ object MkAndBoolean extends NewType {
 val AndBoolean = MkAndBoolean
 type AndBoolean = AndBoolean.T
 ```
-This tecnique is a great help when trying to avoid orphan type class instances for creating a `newtype` allows to have eventual instances in the implicit scope even when the type of interest and the type class itself are owned by someone else and their companion objects cannot be changed. Having this possibility without paying an allocation cost per use is very desirable and cannot be achieved with the language's Value Classes. Consideing this example in fact
+This tecnique is a great help when trying to avoid orphan type class instances for, creating a `newtype`, allows to have eventual instances in the implicit scope even when the type of interest and the type class itself are owned by someone else and their companion objects cannot be changed. Having this possibility without paying an allocation cost per use is very desirable and cannot be achieved with the language's Value Classes. Considering this example in fact
 ```scala
 class ValueClass(val v: Boolean) extends AnyVal
 
