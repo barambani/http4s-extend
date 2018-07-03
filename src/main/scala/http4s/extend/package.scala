@@ -12,7 +12,7 @@ package object extend {
   type ExceptionDisplay = ExceptionDisplay.T
 
   val Void = MkVoid
-  type Void = Void.T
+  type Void = Void.type
 
   val AndBoolean = MkAndBoolean
   type AndBoolean = AndBoolean.T

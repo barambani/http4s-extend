@@ -3,16 +3,12 @@ package http4s.extend.types
 import http4s.extend.{AndBoolean, NewType}
 import scalaz.{Monoid, Semigroup}
 
-object MkAndBoolean extends NewType with AndBooleanInstances {
-  def apply(b: Boolean): T = b.asInstanceOf[T]
-  def mkF[F[_]](fs: F[Boolean]): F[T] = fs.asInstanceOf[F[T]]
+object MkAndBoolean
+  extends NewType[Boolean]
+  with AndBooleanInstances
+  with AndBooleanSyntax
 
-  implicit final class MkAndBooleanSyntax(val t: T) extends AnyVal {
-    def unMk: Boolean = t.asInstanceOf[Boolean]
-  }
-}
-
-private[types] sealed trait AndBooleanInstances extends AndBooleanSyntax {
+private[types] sealed trait AndBooleanInstances {
 
   implicit val andBooleanSemigroup: Semigroup[AndBoolean] =
     new Semigroup[AndBoolean] {
