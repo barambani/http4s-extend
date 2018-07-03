@@ -27,14 +27,7 @@ For its own purpose is integration, Http4s Extend will bring into a using projec
 ### New Type
 The `NewType` trait is a building block to help create zero allocation new types like
 ```scala
-object MkAndBoolean extends NewType {
-  def apply(b: Boolean): T = b.asInstanceOf[T]
-  def mkF[F[_]](fs: F[Boolean]): F[T] = fs.asInstanceOf[F[T]]
-
-  implicit final class MkAndBooleanSyntax(val t: T) extends AnyVal {
-    def unMk: Boolean = t.asInstanceOf[Boolean]
-  }
-}
+object MkAndBoolean extends NewType[Boolean]
 
 val AndBoolean = MkAndBoolean
 type AndBoolean = AndBoolean.T
