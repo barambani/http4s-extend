@@ -5,17 +5,12 @@ import cats.instances.string._
 import http4s.extend.util.MonadErrorUtil
 import http4s.extend.{ExceptionDisplay, Iso, NewType}
 
-object MkExceptionDisplay extends NewType with ExceptionDisplayCatsTypeclassInstances with ExceptionDisplayFunctions {
+object MkExceptionDisplay
+  extends NewType[String]
+  with ExceptionDisplayCatsTypeclassInstances
+  with ExceptionDisplayFunctions
 
-  def apply(b: String): T = b.asInstanceOf[T]
-  def mkF[F[_]](fs: F[String]): F[T] = fs.asInstanceOf[F[T]]
-
-  implicit final class MkExceptionDisplaySyntax(val t: T) extends AnyVal {
-    def unMk: String = t.asInstanceOf[String]
-  }
-}
-
-private[types] sealed trait ExceptionDisplayCatsTypeclassInstances {
+private[types] sealed trait ExceptionDisplayCatsTypeclassInstances extends ExceptionDisplayScalazTypeclassInstances {
 
   implicit val exceptionDisplayEq: Eq[ExceptionDisplay] =
     Eq.by[ExceptionDisplay, String](_.unMk)

@@ -16,5 +16,5 @@ private[test] trait CogenInstances {
     ev contramap (_.unMk)
 
   implicit def voidCogen(implicit ev: Cogen[Unit]): Cogen[Void] =
-    ev contramap (_.unMk)
+    ev contramap ((_: Void) => ())
 }

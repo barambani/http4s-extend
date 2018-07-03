@@ -3,16 +3,12 @@ package http4s.extend.types
 import http4s.extend.{NewType, OrBoolean}
 import scalaz.{Monoid, Semigroup}
 
-object MkOrBoolean extends NewType with OrBooleanInstances {
-  def apply(b: Boolean): T = b.asInstanceOf[T]
-  def mkF[F[_]](fs: F[Boolean]): F[T] = fs.asInstanceOf[F[T]]
+object MkOrBoolean
+  extends NewType[Boolean]
+  with OrBooleanInstances
+  with OrBooleanSyntax
 
-  implicit final class MkOrBooleanSyntax(val t: T) extends AnyVal {
-    def unMk: Boolean = t.asInstanceOf[Boolean]
-  }
-}
-
-private[types] sealed trait OrBooleanInstances extends OrBooleanSyntax {
+private[types] sealed trait OrBooleanInstances {
 
   implicit val orBooleanSemigroup: Semigroup[OrBoolean] =
     new Semigroup[OrBoolean] {
