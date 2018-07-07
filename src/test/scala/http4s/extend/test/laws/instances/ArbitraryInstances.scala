@@ -1,17 +1,12 @@
 package http4s.extend.test.laws.instances
 
-import http4s.extend.{ExceptionDisplay, Void}
+import http4s.extend.ExceptionDisplay
 import monix.eval.{Task => MonixTask}
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary
 import scalaz.concurrent.{Task => ScalazTask}
 
 
 private[test] trait ArbitraryInstances {
-
-  implicit val arbVoid: Arbitrary[Void] =
-    Arbitrary[Void] {
-      Gen.const[Void](Void)
-    }
 
   implicit def throwableCompleteMessageArb(implicit A: Arbitrary[String]): Arbitrary[ExceptionDisplay] =
     Arbitrary { A.arbitrary map ExceptionDisplay.apply }

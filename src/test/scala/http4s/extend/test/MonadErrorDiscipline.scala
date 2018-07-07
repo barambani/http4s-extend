@@ -10,9 +10,9 @@ import cats.instances.string._
 import cats.instances.tuple._
 import cats.instances.unit._
 import cats.laws.discipline.MonadErrorTests
+import http4s.extend.ExceptionDisplay
 import http4s.extend.test.Fixtures.MinimalSuite
 import http4s.extend.util.ThrowableInstances
-import http4s.extend.{ExceptionDisplay, Void}
 import org.scalacheck.Arbitrary.arbDouble
 import scalaz.concurrent.{Task => ScalazTask}
 
@@ -31,11 +31,6 @@ final class MonadErrorDiscipline extends MinimalSuite with ThrowableInstances {
   )
 
   checkAll(
-    "MonadError[IO, Void]",
-    MonadErrorTests[IO, Void].monadError[String, Int, Double]
-  )
-
-  checkAll(
     "MonadError[ScalazTask, ExceptionDisplay]",
     MonadErrorTests[ScalazTask, ExceptionDisplay].monadError[String, Int, Double]
   )
@@ -43,10 +38,5 @@ final class MonadErrorDiscipline extends MinimalSuite with ThrowableInstances {
   checkAll(
     "MonadError[ScalazTask, Throwable]",
     MonadErrorTests[ScalazTask, Throwable].monadError[String, Int, Double]
-  )
-
-  checkAll(
-    "MonadError[ScalazTask, Void]",
-    MonadErrorTests[ScalazTask, Void].monadError[String, Int, Double]
   )
 }

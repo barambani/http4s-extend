@@ -14,7 +14,7 @@ import cats.{Eq, MonadError}
 import http4s.extend.test.Fixtures.MinimalSuite
 import http4s.extend.test.laws.checks.EffectfulLawsChecks
 import http4s.extend.util.ThrowableInstances
-import http4s.extend.{Effectful, ExceptionDisplay, Void}
+import http4s.extend.{Effectful, ExceptionDisplay}
 import org.scalacheck.Arbitrary.arbDouble
 import org.scalacheck.{Arbitrary, Prop}
 
@@ -28,10 +28,8 @@ final class EffectfulDiscipline extends MinimalSuite with ThrowableInstances {
     implicit
       ev1: Effectful[ExceptionDisplay, F],
       ev2: Effectful[Throwable, F],
-      ev3: Effectful[Void, F],
       ev4: MonadError[F, Throwable],
       ev5: MonadError[F, ExceptionDisplay],
-      ev6: MonadError[F, Void],
       AFD: Arbitrary[F[Double]],
       AFI: Arbitrary[F[Int]],
       EFD: Eq[F[Double]],
@@ -39,8 +37,7 @@ final class EffectfulDiscipline extends MinimalSuite with ThrowableInstances {
       EFU: Eq[F[Unit]],
       EFS: Eq[F[String]],
       EED: Eq[F[Either[ExceptionDisplay, Double]]],
-      EEI: Eq[F[Either[Throwable, Int]]],
-      EEV: Eq[F[Either[Void, Int]]]) = {
+      EEI: Eq[F[Either[Throwable, Int]]]) = {
 
     checkAll(
       s"Effectful[ExceptionDisplay, $effectName]",
@@ -50,11 +47,6 @@ final class EffectfulDiscipline extends MinimalSuite with ThrowableInstances {
     checkAll(
       s"Effectful[Throwable, $effectName]",
       EffectfulLawsChecks[Throwable, F].effectful[Int]
-    )
-
-    checkAll(
-      s"Effectful[Void, $effectName]",
-      EffectfulLawsChecks[Void, F].effectful[Int]
     )
 
     test(s"Effectful[Throwable, $effectName]: throw a Throwable in delay is raiseError"){

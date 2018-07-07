@@ -2,21 +2,17 @@ package http4s.extend.types
 
 import cats.Eq
 import http4s.extend.util.MonadErrorUtil
-import http4s.extend.{Iso, Void}
+import http4s.extend.Iso
 
-private[extend] object MkVoid extends VoidCatsTypeclassInstances
+private[extend] sealed trait Void
+
+private[types] object Void extends VoidCatsTypeclassInstances
 
 private[types] sealed trait VoidCatsTypeclassInstances extends VoidScalazTypeclassInstances {
 
   implicit val voidEq: Eq[Void] =
     new Eq[Void] {
       def eqv(x: Void, y: Void): Boolean = true
-    }
-
-  implicit val isoThrowable: Iso[Throwable, Void] =
-    new Iso[Throwable, Void] {
-      def to: Throwable => Void = _ => Void
-      def from: Void => Throwable = _ =>  new Exception("Undefined")
     }
 
   implicit def monadError[F[_], E](implicit M: cats.MonadError[F, E], I: Iso[E, Void]): cats.MonadError[F, Void] =

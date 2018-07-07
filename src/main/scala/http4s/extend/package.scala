@@ -11,8 +11,7 @@ package object extend {
   val ExceptionDisplay = MkExceptionDisplay
   type ExceptionDisplay = ExceptionDisplay.T
 
-  val Void = MkVoid
-  type Void = Void.type
+  type Void = types.Void
 
   val AndBoolean = MkAndBoolean
   type AndBoolean = AndBoolean.T

@@ -3,14 +3,14 @@ import sbt._
 object Dependencies {
 
   private[Dependencies] object versionOf {
-    val http4s    = "0.18.13"
-    val monix     = "3.0.0-RC1"
-    val scalaz    = "7.2.25"
-    val cats      = "1.1.0"
-    val shapeless = "2.3.3"
+    val http4s      = "0.18.13"
+    val monix       = "3.0.0-RC1"
+    val scalaz      = "7.2.25"
+    val cats        = "1.1.0"
+    val catsEffect  = "1.0.0-RC"
+    val shapeless   = "2.3.3"
 
     val scalaCheck      = "1.13.5"
-    val catsEffectLaws  = "1.0.0-RC"
 
     val kindProjector = "0.9.7"
     val splain        = "0.3.1"
@@ -30,9 +30,9 @@ object Dependencies {
   ) map (_.withSources)
 
   val testDependencies: Seq[ModuleID] = Seq(
-    "org.typelevel"   %% "cats-testkit"     % versionOf.cats            % "test",
-    "org.scalacheck"  %% "scalacheck"       % versionOf.scalaCheck      % "test",
-    "org.typelevel"   %% "cats-effect-laws" % versionOf.catsEffectLaws  % "test"
+    "org.typelevel"   %% "cats-testkit"     % versionOf.cats        % "test",
+    "org.scalacheck"  %% "scalacheck"       % versionOf.scalaCheck  % "test",
+    "org.typelevel"   %% "cats-effect-laws" % versionOf.catsEffect  % "test"
   )
 
   val compilerPlugins: Seq[ModuleID] = Seq(
