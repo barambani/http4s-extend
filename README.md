@@ -63,7 +63,7 @@ class testValueClass {
 and giving a look at its disassembled code we can see how `NewType`'s approach differs from the Value Classes in terms of allocations.
 
 **Tuple**
-```
+```scala
 public http4s.extend.testValueClass();
   descriptor: ()V
     Code:
@@ -102,7 +102,7 @@ public http4s.extend.testNewType();
       70: putfield      #55                 // Field ntTuple:Lscala/Tuple2;
 ```
 **List**
-```
+```scala
 public http4s.extend.testValueClass();
     descriptor: ()V
     Code:
@@ -160,7 +160,7 @@ public http4s.extend.testNewType();
      115: putfield      #62                 // Field ntLs:Lscala/collection/immutable/List;
 ```
 **Identity**
-```
+```scala
 public http4s.extend.testValueClass();
     descriptor: ()V
     Code:
