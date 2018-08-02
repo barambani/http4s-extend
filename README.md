@@ -60,7 +60,7 @@ class testValueClass {
   val vcId = identity(vcA1)
 }
 ```
-and giving a look at its disassembled code we can see how `NewType`'s approach differs from the Value Classes in terms of allocations.
+and giving a look at its disassembled code we can see how `NewType`'s approach differs from the Value Classes in terms of allocations (see how the occurrences of `new` differ).
 
 **Tuple**
 ```scala
