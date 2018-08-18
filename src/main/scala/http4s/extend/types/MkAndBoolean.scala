@@ -1,10 +1,10 @@
 package http4s.extend.types
 
-import http4s.extend.{AndBoolean, NewType}
+import http4s.extend.{AndBoolean, newtype}
 import scalaz.{Monoid, Semigroup}
 
 object MkAndBoolean
-  extends NewType[Boolean]
+  extends newtype[Boolean]
   with AndBooleanInstances
   with AndBooleanSyntax
 

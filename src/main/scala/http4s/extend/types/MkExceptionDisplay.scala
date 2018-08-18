@@ -3,10 +3,10 @@ package http4s.extend.types
 import cats.Eq
 import cats.instances.string._
 import http4s.extend.util.MonadErrorUtil
-import http4s.extend.{ExceptionDisplay, Iso, NewType}
+import http4s.extend.{ExceptionDisplay, Iso, newtype}
 
 object MkExceptionDisplay
-  extends NewType[String]
+  extends newtype[String]
   with ExceptionDisplayCatsTypeclassInstances
   with ExceptionDisplayFunctions
 

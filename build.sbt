@@ -2,6 +2,7 @@ import Dependencies._
 import ScalacOptions._
 import Templates.{ArityFunctionsGenerator, ArityTestsGenerator}
 import sbt.Keys.sourceGenerators
+import sbtrelease.ReleaseStateTransformations._
 
 val typelevelOrganization = "org.typelevel"
 val globalOrganization = scalaOrganization in Global
@@ -27,6 +28,20 @@ val crossBuildSettings: Seq[Def.Setting[_]] = Seq(
 )
 
 val releaseSettings: Seq[Def.Setting[_]] = Seq(
+  releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,
+    inquireVersions,
+    runClean,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    publishArtifacts,
+    setNextVersion,
+    commitNextVersion,
+    releaseStepCommand("sonatypeRelease"),
+    pushChanges
+  ),
   releaseCrossBuild             := true,
   publishMavenStyle             := true,
   credentials                   := Credentials(Path.userHome / ".ivy2" / ".credentials") :: Nil,

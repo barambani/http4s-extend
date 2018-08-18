@@ -1,10 +1,10 @@
 package http4s.extend.types
 
-import http4s.extend.{NewType, OrBoolean}
+import http4s.extend.{OrBoolean, newtype}
 import scalaz.{Monoid, Semigroup}
 
 object MkOrBoolean
-  extends NewType[Boolean]
+  extends newtype[Boolean]
   with OrBooleanInstances
   with OrBooleanSyntax
 

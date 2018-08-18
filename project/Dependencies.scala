@@ -3,9 +3,9 @@ import sbt._
 object Dependencies {
 
   private[Dependencies] object versionOf {
-    val http4s      = "0.18.15"
+    val http4s      = "0.18.16"
     val monix       = "3.0.0-RC1"
-    val scalaz      = "7.2.25"
+    val scalaz      = "7.2.26"
     val cats        = "1.2.0"
     val catsEffect  = "1.0.0-RC"
     val shapeless   = "2.3.3"
