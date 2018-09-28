@@ -13,7 +13,7 @@ object Dependencies {
     val scalaCheck      = "1.13.5"
 
     val kindProjector = "0.9.7"
-    val splain        = "0.3.1"
+    val splain        = "0.3.3"
     val silencer      = "1.0"
   }
 
