@@ -14,7 +14,7 @@ object Dependencies {
 
     val kindProjector = "0.9.7"
     val splain        = "0.3.3"
-    val silencer      = "1.0"
+    val silencer      = "1.2.1"
   }
 
   val externalDependencies: Seq[ModuleID] = Seq(
