@@ -10,7 +10,7 @@ object Dependencies {
     val catsEffect  = "1.0.0-RC"
     val shapeless   = "2.3.3"
 
-    val scalaCheck      = "1.13.5"
+    val scalaCheck      = "1.14.0"
 
     val kindProjector = "0.9.8"
     val splain        = "0.3.3"
