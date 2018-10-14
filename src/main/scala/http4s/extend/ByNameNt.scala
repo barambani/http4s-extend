@@ -67,7 +67,7 @@ private[extend] sealed trait ByNameNtInstances {
       val evG = scalazTaskFunctor
 
       def apply[A]: (=>IO[A]) => ScalazTask[A] =
-        fa => Eval.always(
+        fa => Eval.always[ScalazTask[A]](
           fa.attempt.unsafeRunSync.fold(ScalazTask.fail, a => ScalazTask.delay(a))
         ).value
     }

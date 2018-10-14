@@ -57,7 +57,7 @@ private[Templates] object ParEffectfulSyntaxAccumulateErrorTests extends Templat
             `sym e0..en-1` map (e => s"ioEff.fail[Int]($e)") mkString ", "
 
           lazy val `scalazTaskEff.fail[Int](e0)..scalazTaskEff.fail[Int](en-1)` =
-            `sym e0..en-1` map (e => s"ScalazTask.fail($e)") mkString ", "
+            `sym e0..en-1` map (e => s"ScalazTask.fail[Int]($e)") mkString ", "
 
           lazy val `(e1 combine e2) ... combine en-1` =
             leftAssociativeExpansionOf(`sym e0..en-1`)("")(" combine ")
