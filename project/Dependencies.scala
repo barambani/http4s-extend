@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
 
   private[Dependencies] object versionOf {
-    val http4s      = "0.18.20"
+    val http4s      = "0.18.21"
     val monix       = "3.0.0-RC1"
     val scalaz      = "7.3.0-M25"
     val cats        = "1.4.0"
