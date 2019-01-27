@@ -7,7 +7,7 @@ object Dependencies {
     val monix       = "3.0.0-RC1"
     val scalaz      = "7.3.0-M25"
     val cats        = "1.5.0"
-    val catsEffect  = "1.0.0-RC"
+    val catsEffect  = "1.0.0"
     val shapeless   = "2.3.3"
 
     val scalaCheck      = "1.13.5"
