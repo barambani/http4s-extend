@@ -6,7 +6,7 @@ object Dependencies {
     val http4s      = "0.18.23"
     val monix       = "3.0.0-RC1"
     val scalaz      = "7.3.0-M27"
-    val cats        = "1.6.0"
+    val cats        = "1.6.1"
     val catsEffect  = "1.0.0-RC"
     val shapeless   = "2.3.3"
 
