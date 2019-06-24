@@ -5,8 +5,6 @@ import cats.arrow.FunctionK
 import cats.effect.IO
 import cats.instances.future.catsStdInstancesForFuture
 import cats.{Eval, Functor}
-import monix.eval.{Task => MonixTask}
-import monix.execution.Scheduler
 import scalaz.concurrent.{Task => ScalazTask}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,14 +37,6 @@ private[extend] sealed trait ByNameNtInstances {
 
       def apply[A]: (=>Future[A]) => IO[A] =
         IO.fromFuture[A] _ compose IO.eval[Future[A]] compose always
-    }
-
-  implicit def monixTaskToIo(implicit s: Scheduler): MonixTask ~~> IO =
-    new ByNameNt[MonixTask, IO] {
-      val evF = Functor[MonixTask]
-      val evG = Functor[IO]
-
-      def apply[A]: (=>MonixTask[A]) => IO[A] = _.toIO
     }
 
   implicit def scalazTaskToIo: ScalazTask ~~> IO =

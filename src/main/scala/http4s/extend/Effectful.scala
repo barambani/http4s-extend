@@ -55,7 +55,9 @@ private[extend] sealed trait EffectfulInstances {
       def async[A]: ((Either[E, A] => Unit) => Unit) => IO[A] =
         asyncAction => IO.async {
           failingWithThrowable => asyncAction {
-            failingWithThrowable compose { (errorOrA: Either[E, A]) => errorOrA leftMap iso.from }
+            failingWithThrowable compose { errorOrA: Either[E, A] =>
+              errorOrA leftMap iso.from
+            }
           }
         }
 
@@ -64,7 +66,7 @@ private[extend] sealed trait EffectfulInstances {
           failingWithThrowable => action {
             failingWithThrowable leftMap iso.to
           }
-        }
+        }.toIO
     }
 }
 

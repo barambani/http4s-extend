@@ -1,12 +1,10 @@
 package http4s.extend
 
-import cats.effect.{Effect, IO}
+import cats.effect.{ContextShift, Effect, IO}
 import cats.syntax.apply._
 import cats.syntax.either._
 import cats.{Applicative, Id, Monoid, Semigroup, Traverse}
 import scalaz.concurrent.{Task => ScalazTask}
-
-import scala.concurrent.ExecutionContext
 
 /**
   * ParEffectful describes the execution of F[_] in parallel.
@@ -19,7 +17,7 @@ trait ParEffectful[F[_]] {
 
 private[extend] sealed trait ParEffectfulInstances {
 
-  implicit def ioEffectfulOp(implicit ev: Semigroup[Throwable], ec: ExecutionContext): ParEffectful[IO] =
+  implicit def ioEffectfulOp(implicit ev: Semigroup[Throwable], cs: ContextShift[IO]): ParEffectful[IO] =
     new ParEffectful[IO] {
 
       val evidence = Effect[IO]
