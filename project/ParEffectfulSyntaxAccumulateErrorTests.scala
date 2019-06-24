@@ -14,31 +14,17 @@ private[Templates] object ParEffectfulSyntaxAccumulateErrorTests extends Templat
       val staticTop =
         static"""package http4s.extend.test
           |
-          |import cats.Semigroup
-          |import cats.effect.IO
-          |import cats.effect.laws.util.TestContext
-          |import cats.effect.util.CompositeException
           |import cats.instances.unit._
           |import cats.laws._
           |import cats.laws.discipline._
           |import cats.syntax.semigroup._
-          |import http4s.extend.Effectful
           |import http4s.extend.syntax.parEffectful._
           |import http4s.extend.test.Fixtures.MinimalSuite
           |import org.scalacheck.Prop
           |import scalaz.concurrent.{Task => ScalazTask}
           |
           |final class ParEffectfulSyntaxAccumulateErrorTests extends MinimalSuite {
-          |
-          |  implicit val C = TestContext()
-          |
-          |  implicit def throwableSemigroup: Semigroup[Throwable] =
-          |    new Semigroup[Throwable]{
-          |      def combine(x: Throwable, y: Throwable): Throwable =
-          |        CompositeException(x, y, Nil)
-          |    }
-          |
-          |  def ioEff = Effectful[Throwable, IO]"""
+        """
 
       val staticBottom = static"""}"""
 

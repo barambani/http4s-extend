@@ -3,7 +3,8 @@ package Templates
 import sbt._
 
 /**
-  * This code is inspired by the Boilerplate generator of typelevel.cats. It can be found at the following link
+  * This code is inspired by the Boilerplate generator of typelevel.cats.
+ * It can be found at the following link
   *
   * https://github.com/typelevel/cats/blob/master/project/Boilerplate.scala
  */

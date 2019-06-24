@@ -10,7 +10,7 @@ private[syntax] trait Http4sServiceSyntax {
 }
 
 /**
-  * Here the parameter's type needs to be esplicitely de-aliased to
+  * Here the parameter's type needs to be explicitly de-aliased to
   * Kleisli[OptionT[F, ?], Request[F], Response[F]] otherwise the compilation
   * will fail when the parameter is made non private
   */

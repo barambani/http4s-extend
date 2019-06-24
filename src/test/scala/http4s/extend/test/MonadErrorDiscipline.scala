@@ -2,7 +2,6 @@ package http4s.extend.test
 
 import cats.effect.IO
 import cats.effect.laws.discipline.arbitrary._
-import cats.effect.laws.util.TestContext
 import cats.instances.double._
 import cats.instances.either._
 import cats.instances.int._
@@ -17,8 +16,6 @@ import org.scalacheck.Arbitrary.arbDouble
 import scalaz.concurrent.{Task => ScalazTask}
 
 final class MonadErrorDiscipline extends MinimalSuite with ThrowableInstances {
-
-  implicit val C = TestContext()
 
   checkAll(
     "MonadError[IO, ExceptionDisplay]",

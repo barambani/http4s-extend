@@ -9,7 +9,7 @@ val globalOrganization = scalaOrganization in Global
 
 val scala_typelevel_212 = "2.12.4-bin-typelevel-4"
 val scala_211 = "2.11.12"
-val scala_212 = "2.12.7"
+val scala_212 = "2.12.8"
 
 val crossBuildSettings: Seq[Def.Setting[_]] = Seq(
   scalacOptions           ++= crossBuildOptions,
