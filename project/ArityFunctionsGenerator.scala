@@ -1,4 +1,4 @@
-package Templates
+package BoilerplateGeneration
 
 import sbt.File
 
@@ -8,7 +8,7 @@ object ArityFunctionsGenerator {
     BoilerplateGenerator(templates).run
 
   private val templates: Seq[Template] = Seq(
-    ParEffectfulArityFunctions,
-    ParEffectfulAritySyntax
+    ParallelEffectArityFunctions,
+    ParallelEffectAritySyntax
   )
 }

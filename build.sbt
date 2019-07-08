@@ -1,6 +1,6 @@
 import Dependencies._
 import ScalacOptions._
-import Templates.{ArityFunctionsGenerator, ArityTestsGenerator}
+import BoilerplateGeneration.{ ArityFunctionsGenerator, ArityTestsGenerator }
 import sbt.Keys.sourceGenerators
 import sbtrelease.ReleaseStateTransformations._
 

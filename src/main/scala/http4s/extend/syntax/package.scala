@@ -13,6 +13,6 @@ package object syntax {
   object errorAdapt           extends ErrorAdaptSyntax
   object httpService          extends Http4sServiceSyntax
   object responseVerification extends ResponseVerificationSyntax
-  object parEffectful         extends ParEffectfulSyntax
+  object parallelEffect       extends ParallelEffectSyntax with ParallelEffectAritySyntax
   object errorResponse        extends ErrorResponseSyntax
 }
