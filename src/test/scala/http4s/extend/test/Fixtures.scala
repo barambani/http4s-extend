@@ -40,6 +40,7 @@ private[test] object Fixtures {
     with    EqTestInstances {
 
     implicit val C = TestContext()
+    implicit val timer        = IO.timer(C)
     implicit val contextShift = IO.contextShift(C)
 
     implicit def throwableSemigroup: Semigroup[Throwable] =

@@ -1,12 +1,12 @@
-package Templates
+package BoilerplateGeneration
 
-import Templates.BlockSyntax._
+import BoilerplateGeneration.BlockSyntax._
 import sbt._
 
-private[Templates] object ParEffectfulSyntaxAccumulateErrorTests extends Template {
+private[BoilerplateGeneration] object ParallelEffectSyntaxAccumulateErrorTests extends Template {
 
   def moduleFile: File => File =
-    _ / "syntax" / "ParEffectfulSyntaxAccumulateErrorTests.scala"
+    _ / "syntax" / "ParallelEffectSyntaxAccumulateErrorTests.scala"
 
   def expandTo: Int => String =
     maxArity => {
@@ -14,17 +14,19 @@ private[Templates] object ParEffectfulSyntaxAccumulateErrorTests extends Templat
       val staticTop =
         static"""package http4s.extend.test
           |
+          |import cats.effect.IO
           |import cats.instances.unit._
           |import cats.laws._
           |import cats.laws.discipline._
           |import cats.syntax.semigroup._
-          |import http4s.extend.syntax.parEffectful._
-          |import http4s.extend.test.Fixtures.MinimalSuite
+          |import http4s.extend.syntax.parallelEffect._
           |import org.scalacheck.Prop
-          |import scalaz.concurrent.{Task => ScalazTask}
           |
-          |final class ParEffectfulSyntaxAccumulateErrorTests extends MinimalSuite {
-        """
+          |import scala.concurrent.duration._
+          |
+          |final class ParallelEffectSyntaxAccumulateErrorTests extends Fixtures.MinimalSuite {
+          |
+          |  val timeout = 1.seconds"""
 
       val staticBottom = static"""}"""
 
@@ -40,7 +42,7 @@ private[Templates] object ParEffectfulSyntaxAccumulateErrorTests extends Templat
             `sym e0..en-1` map (e => s"$e: Throwable") mkString ", "
 
           lazy val `ioEff.fail[Int](e0)..ioEff.fail[Int](en-1)` =
-            `sym e0..en-1` map (e => s"ioEff.fail[Int]($e)") mkString ", "
+            `sym e0..en-1` map (e => s"IO.raiseError[Int]($e)") mkString ", "
 
           lazy val `scalazTaskEff.fail[Int](e0)..scalazTaskEff.fail[Int](en-1)` =
             `sym e0..en-1` map (e => s"ScalazTask.fail[Int]($e)") mkString ", "
@@ -52,15 +54,9 @@ private[Templates] object ParEffectfulSyntaxAccumulateErrorTests extends Templat
             `sym _, ... , _` map (s => s"$s: Int") mkString ("(", ", ", ")")
 
           static"""
-            |  test("$arityS io errors are accumulated by parMap") {
+            |  test("$arityS io errors are accumulated by parallelMap") {
             |    Prop.forAll { (${`e0: Throwable..en-1: Throwable`}) => {
-            |      (${`ioEff.fail[Int](e0)..ioEff.fail[Int](en-1)`}).parMap { ${`(_, ... , _)`} => () } <-> ioEff.fail[Unit](${`(e1 combine e2) ... combine en-1`})
-            |    }}
-            |  }
-            |
-            |  test("$arityS scalaz task errors are accumulated by parMap") {
-            |    Prop.forAll { (${`e0: Throwable..en-1: Throwable`}) => {
-            |      (${`scalazTaskEff.fail[Int](e0)..scalazTaskEff.fail[Int](en-1)`}).parMap { ${`(_: Int, ... , _: Int)`} => () } <-> ScalazTask.fail(${`(e1 combine e2) ... combine en-1`}).map((_: Int) => ())
+            |      (${`ioEff.fail[Int](e0)..ioEff.fail[Int](en-1)`}).parallelMap(timeout){ ${`(_, ... , _)`} => () } <-> IO.raiseError[Unit]${`(e1 combine e2) ... combine en-1`}
             |    }}
             |  }""".stripMargin
         }

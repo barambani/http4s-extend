@@ -1,13 +1,13 @@
-package Templates
+package BoilerplateGeneration
 
 import sbt._
 
 /**
   * This code is inspired by the Boilerplate generator of typelevel.cats.
- * It can be found at the following link
+  * It can be found at the following link
   *
   * https://github.com/typelevel/cats/blob/master/project/Boilerplate.scala
- */
+  */
 final case class BoilerplateGenerator(private val templates: Seq[Template]) {
 
   /**
@@ -17,20 +17,21 @@ final case class BoilerplateGenerator(private val templates: Seq[Template]) {
     * @return a sequence of generated files
     */
   def run: Int => File => Seq[File] =
-    maxArity => root => templates map {
-      t =>
-        val file = t.moduleFile(root)
-        IO.write(file, t.expandTo(maxArity))
-        file
+    maxArity =>
+      root =>
+        templates map { t =>
+          val file = t.moduleFile(root)
+          IO.write(file, t.expandTo(maxArity))
+          file
     }
 }
 
-private[Templates] trait Template {
+private[BoilerplateGeneration] trait Template {
   def moduleFile: File => File
   def expandTo: Int => String
 }
 
-private[Templates] final case class BlockMembersExpansions(private val upToArity: Int) {
+final private[BoilerplateGeneration] case class BlockMembersExpansions(private val upToArity: Int) {
 
   lazy val arityS = upToArity.toString
 
@@ -53,31 +54,54 @@ private[Templates] final case class BlockMembersExpansions(private val upToArity
     `sym fa0..fan-1` zip `sym F[A0]..F[An-1]` map { case (fa, f) => s"$fa: =>$f" } mkString ", "
 
   def leftAssociativeExpansionOf: Seq[String] => String => String => String =
-    symbols => prefix => separator =>
-      if(symbols.size < 2) ""
-      else symbols.drop(2).foldLeft(s"(${symbols.head}$separator${symbols.drop(1).head})")((exp, an) => s"($prefix$exp$separator$an)")
+    symbols =>
+      prefix =>
+        separator =>
+          if (symbols.size < 2) ""
+          else
+            symbols
+              .drop(2)
+              .foldLeft(s"(${symbols.head}$separator${symbols.drop(1).head})")(
+                (exp, an) => s"($prefix$exp$separator$an)"
+        )
 
   def rightAssociativeExpansionOf: Seq[String] => String => String =
-    symbols => prefix =>
-      if(symbols.size <= 2) ""
-      else symbols.dropRight(2).foldRight(s"(${symbols.dropRight(1).last}, ${symbols.last})")((an, exp) => s"($an, $prefix$exp)")
+    symbols =>
+      prefix =>
+        if (symbols.size <= 2) ""
+        else
+          symbols
+            .dropRight(2)
+            .foldRight(s"(${symbols.dropRight(1).last}, ${symbols.last})")((an, exp) => s"($an, $prefix$exp)")
 
-  private[Templates] def arityRange: Range = 0 until upToArity
+  def rightAssociativeWithSuffixExpansionOf: Seq[String] => String => String => String =
+    symbols =>
+      prefix =>
+        suffix =>
+          if (symbols.size <= 2) ""
+          else
+            symbols
+              .dropRight(2)
+              .foldRight(s"(${symbols.dropRight(1).last}, ${symbols.last}$suffix)")(
+                (an, exp) => s"($an, $prefix$exp$suffix)"
+        )
+
+  private[BoilerplateGeneration] def arityRange: Range = 0 until upToArity
 }
 
-private[Templates] object BlockSyntax {
+private[BoilerplateGeneration] object BlockSyntax {
 
   import scala.StringContext._
 
-  implicit final class BlockOps(val sc: StringContext) extends AnyVal {
+  implicit final class BlockOps(private val sc: StringContext) extends AnyVal {
 
     def static(args: String*): String =
       trimLines(args) mkString "\n"
-    
+
     private def trimLines(args: Seq[String]): Array[String] = {
 
       val interpolated = sc.standardInterpolator(treatEscapes, args)
-      val rawLines = interpolated split '\n'
+      val rawLines     = interpolated split '\n'
 
       rawLines map {
         _ dropWhile (_.isWhitespace)
@@ -85,7 +109,7 @@ private[Templates] object BlockSyntax {
     }
   }
 
-  implicit final class BlockExpansionOps(val f: Int => String) extends AnyVal {
+  implicit final class BlockExpansionOps(private val f: Int => String) extends AnyVal {
     def expandedTo(maxArity: Int, skip: Int): String =
       (1 + skip to maxArity) map f mkString "\n"
   }
