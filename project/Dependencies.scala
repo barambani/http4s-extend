@@ -12,7 +12,7 @@ object Dependencies {
 
     val scalaCheck      = "1.13.5"
 
-    val kindProjector = "0.9.10"
+    val kindProjector = "0.10.0"
     val splain        = "0.4.1"
     val silencer      = "1.4.2"
   }
@@ -36,7 +36,7 @@ object Dependencies {
   )
 
   val compilerPlugins: Seq[ModuleID] = Seq(
-    compilerPlugin("org.spire-math"   %% "kind-projector"   % versionOf.kindProjector cross CrossVersion.binary),
+    compilerPlugin("org.typelevel"   %% "kind-projector"   % versionOf.kindProjector cross CrossVersion.binary),
     compilerPlugin("com.github.ghik"  %% "silencer-plugin"  % versionOf.silencer),
     compilerPlugin("io.tryp"          %   "splain"          % versionOf.splain        cross CrossVersion.patch)
   )
